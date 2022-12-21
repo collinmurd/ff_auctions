@@ -1,3 +1,4 @@
+// Component that contains the auction form
 
 import React from "react";
 

@@ -1,3 +1,4 @@
+// component that contains the header (including nav)
 
 import { NavLink } from 'react-router-dom';
 import React from "react";

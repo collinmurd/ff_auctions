@@ -1,4 +1,4 @@
-
+// Component that contains the auction history data
 
 import React from "react";
 

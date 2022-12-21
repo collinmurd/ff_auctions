@@ -23,6 +23,7 @@ export function App() {
   );
 }
 
+// component containing the main page content
 function Main() {
     return (
         <Routes>
