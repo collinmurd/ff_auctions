@@ -14,3 +14,18 @@
     float: right;
     text-align: right;
 }
+
+/* NAV */
+nav ul {
+    text-align: center;
+    padding-top: 10px;
+}
+
+nav a {
+    color: white;
+}
+
+nav li {
+    display: inline;
+    margin: 0 40px;
+}
