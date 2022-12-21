@@ -4,29 +4,48 @@ import './AuctionHistory.css'
 
 import React from "react";
 
-const managersData = [
-    {manager: 'Collin', cashRemaining: 420, weekEliminated: -1},
-    {manager: 'Spencer', cashRemaining: 250, weekEliminated: -1},
-    {manager: 'Nick', cashRemaining: 100, weekEliminated: 1}
-]
+const numberOfWeeks = 18;
 
-const auctionsData = [
-    {
-        week: 1,
-        wins: [
-            {manager: 'Collin', player: 'Cooper Kupp', amount: 400},
-            {manager: 'Nick', player: 'Justin Jefferson', amount: 900},
+const data = {
+    'Collin': {
+        amountRemaining: 345,
+        weekEliminated: -1,
+        auctions: [
+            [
+                {player: 'Nick Chubb', amount: 400}
+            ],
+            [
+                {player: 'Nick Chubb', amount: 400},
+                {player: 'Nick Chubb', amount: 400}
+            ],
+            [
+                {player: 'Nick Chubb', amount: 400}
+            ]
         ]
     },
-    {
-        week: 2,
-        wins: [
-            {manager: 'Collin', player: 'Nick Chubb', amount: 180},
-            {manager: 'Spencer', player: 'Justin Jefferson', amount: 500},
-            {manager: 'Spencer', player: 'Tyreek Hill', amount: 250}
+    'Nick': {
+        amountRemaining: 90,
+        weekEliminated: -1,
+        auctions: [
+            [],
+            [],
+            [
+                {player: 'Nick Chubb', amount: 400}
+            ]
         ]
     },
-];
+    'Spencer': {
+        amountRemaining: 400,
+        weekEliminated: 2,
+        auctions: [
+            [
+                {player: 'Justin Jefferson', amount: 700}
+            ],
+            [],
+            []
+        ]
+    }
+}
 
 type AuctionHistoryTypes = {
 
@@ -42,29 +61,41 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
             <div>
                 <h2>Auction History</h2>
                 <table>
-                    <tr>
-                        <th></th>
-                        <WeekSquare week={1} />
-                        <WeekSquare week={2} />
-                    </tr>
-                    <tr>
-                        <ManagerSquare name="Collin" cashRemaining={420}/>
-                        <WinSquare manager="Collin" players={[{name: "Cooper Kupp", amount: 400}]}/>
-                        <WinSquare manager="Collin" players={[{name: "Nick Chubb", amount: 180}]}/>
-                    </tr>
-                    <tr>
-                        <ManagerSquare name="Spencer" cashRemaining={250}/>
-                        <td></td>
-                        <WinSquare manager="Spencer" players={[{name: "Justin Jefferson", amount: 500}, {name: "Tyreek Hill", amount: 200}]}/>
-                    </tr>
-                    <tr>
-                        <ManagerSquare name="Nick" cashRemaining={100}/>
-                        <WinSquare manager="Nick" players={[{name: "Justin Jefferson", amount: 900}]}/>
-                        <td></td>
-                    </tr>
+                    <thead>{this.weekRow()}</thead>
+                    <tbody>{this.managerRows()}</tbody>
                 </table>
             </div>
         );
+    }
+
+    weekRow() {
+        let squares = [];
+        for (let i = 1; i <= numberOfWeeks; i++) {
+            squares.push(<WeekSquare key={i} week={i} />);
+        }
+        return (
+            <tr>
+                <th></th>
+                {squares}
+            </tr>
+        );
+    }
+
+    managerRows() {
+        let rows = [];
+        for (let [manager, managerData] of Object.entries(data)) {
+            console.log(Object.entries(managerData.auctions))
+            let squares = managerData.auctions.map((players) => {
+                return <WinSquare manager={manager} players={players} />
+            });
+            rows.push(
+                <tr>
+                    <ManagerSquare name={manager} cashRemaining={managerData.amountRemaining} />
+                    {squares}
+                </tr>
+            );
+        }
+        return rows;
     }
 }
 
@@ -72,7 +103,7 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
 
 function WeekSquare(props: {week: number}) {
     return (
-        <th>
+        <th className="weekSquare">
             <p>Week</p>
             <p>{props.week}</p>
         </th>
@@ -83,9 +114,9 @@ function WeekSquare(props: {week: number}) {
 
 function ManagerSquare(props: {name: string, cashRemaining: number}) {
     return (
-        <th>
+        <th className="managerSquare">
             <h5>{props.name}</h5>
-            <p>Cash: ${props.cashRemaining}</p>
+            <p>Remaining Cash: ${props.cashRemaining}</p>
         </th>
     );
 }
@@ -94,13 +125,13 @@ function ManagerSquare(props: {name: string, cashRemaining: number}) {
 
 type WinSquareProps = {
     manager: string,
-    players: {name: string, amount: number}[]
+    players: {player: string, amount: number}[]
 }
 function WinSquare(props: WinSquareProps) {
     const playerList = props.players.map((player) =>
-        <li key={player.name}>
-            <p className="win-player-name">{player.name}</p>
-            <p className="win-player-amount">{player.amount}</p>
+        <li key={player.player}>
+            <p className="win-player-name">{player.player}</p>
+            <p className="win-player-amount">${player.amount}</p>
         </li>
     );
     return (

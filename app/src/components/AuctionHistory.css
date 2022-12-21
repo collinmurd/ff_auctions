@@ -19,6 +19,21 @@ td {
     border: 1px solid purple;
 }
 
+/* WeekSquare */
+.weekSquare {
+    min-width: 200px;
+}
+
+/* ManagerSquare */
+.managerSquare {
+    min-width: 150px;
+}
+
+.managerSquare p {
+    font-size: 14px;
+    font-weight: normal;
+}
+
 /* WinSquare */
 
 .win-player-name {
