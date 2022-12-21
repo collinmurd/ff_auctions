@@ -1,5 +1,10 @@
-import Header from './Header';
+
+import { Route, Routes } from 'react-router-dom';
+
 import './App.css'
+import { Auction } from './Auction';
+import { AuctionHistory } from './AuctionHistory';
+import { Header } from './Header';
 
 const user = {
   name: 'Collin',
@@ -11,7 +16,18 @@ export function App() {
     <div className="App">
       <header className="App-header">
         <Header user={user} />
+        <Main />
       </header>
+
     </div>
   );
+}
+
+function Main() {
+    return (
+        <Routes>
+            <Route index element={<Auction />} />
+            <Route path='/history' element={<AuctionHistory />} />
+        </Routes>
+    );
 }
