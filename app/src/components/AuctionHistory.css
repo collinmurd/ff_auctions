@@ -1,0 +1,35 @@
+
+table {
+    border: 1px solid red;
+    width: 100%;
+    margin: 0 auto;
+}
+
+tr {
+    border: 1px solid blue;
+}
+
+th {
+    font-weight: bold;
+    border: 1px solid green;
+    padding: 10px;
+}
+
+td {
+    border: 1px solid purple;
+}
+
+/* WinSquare */
+
+.win-player-name {
+    display: inline-block;
+}
+
+.win-player-amount {
+    float: right;
+    margin-left: 20px;
+}
+
+ul {
+    list-style: none;
+}

@@ -38,3 +38,8 @@ h4 {
 h4 {
     font-size: 1em;
 }
+
+#main {
+    width: 75%;
+    margin: 0 auto;
+}

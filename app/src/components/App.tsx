@@ -7,20 +7,21 @@ import { AuctionHistory } from './AuctionHistory';
 import { Header } from './Header';
 
 const user = {
-  name: 'Collin',
-  balance: 420
+    name: 'Collin',
+    balance: 420
 };
 
 export function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <Header user={user} />
-        <Main />
-      </header>
-
-    </div>
-  );
+    return (
+        <div className="App">
+            <header className="App-header">
+                <Header user={user} />
+            </header>
+            <div id="main">
+                <Main />
+            </div>
+        </div>
+    );
 }
 
 // component containing the main page content
