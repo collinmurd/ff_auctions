@@ -1,0 +1,16 @@
+
+.header {
+    padding: 20px 40px;
+    font-family: Helvetica;
+    background-color: #782951;
+    color: white;
+}
+
+.title {
+    display: inline-block;
+}
+
+.userInfo {
+    float: right;
+    text-align: right;
+}
