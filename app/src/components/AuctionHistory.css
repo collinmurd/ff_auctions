@@ -10,8 +10,11 @@
 }
 
 .auctionTableAndInput {
-    border-spacing: 0;
     margin: 30px 0;
+}
+
+.auctionTableAndInput table {
+    border-spacing: 0;
 }
 
 th {

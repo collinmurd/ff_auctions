@@ -14,14 +14,14 @@ const data = {
         weekEliminated: null,
         auctions: [
             [
-                {player: 'Nick Chubb', amount: 400}
+                {player: 'Tyreek Hill', amount: 400}
             ],
             [
                 {player: 'Nick Chubb', amount: 400},
                 {player: 'Justin Jefferson', amount: 500}
             ],
             [
-                {player: 'Nick Chubb', amount: 400}
+                {player: 'Darren Waller', amount: 400}
             ]
         ]
     },
