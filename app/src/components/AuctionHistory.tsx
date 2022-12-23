@@ -6,10 +6,12 @@ import React from "react";
 
 const numberOfWeeks = 18;
 
+const currentWeek = 4;
+
 const data = {
     'Collin': {
         amountRemaining: 345,
-        weekEliminated: -1,
+        weekEliminated: null,
         auctions: [
             [
                 {player: 'Nick Chubb', amount: 400}
@@ -25,7 +27,7 @@ const data = {
     },
     'Nick': {
         amountRemaining: 90,
-        weekEliminated: -1,
+        weekEliminated: null,
         auctions: [
             [],
             [],
@@ -86,9 +88,14 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
     managerRows() {
         let rows = [];
         for (let [manager, managerData] of Object.entries(data)) {
-            let squares = managerData.auctions.map((players) => {
-                return <WinSquare manager={manager} players={players} />
-            });
+            let squares = [];
+            for (let week = 1; week < currentWeek; week++) {
+                if (managerData.weekEliminated && managerData.weekEliminated <= week) {
+                    squares.push(<EliminatedSquare />)
+                } else {
+                    squares.push(<AliveSquare manager={manager} players={managerData.auctions[week - 1]}/>)
+                }
+            }
             rows.push(
                 <tr>
                     <ManagerSquare name={manager} cashRemaining={managerData.amountRemaining} />
@@ -124,11 +131,11 @@ function ManagerSquare(props: {name: string, cashRemaining: number}) {
 
 // ----------------------------------------------
 
-type WinSquareProps = {
+type AliveSquareProps = {
     manager: string,
     players: {player: string, amount: number}[]
 }
-function WinSquare(props: WinSquareProps) {
+function AliveSquare(props: AliveSquareProps) {
     const playerList = props.players.map((player) =>
         <li key={player.player}>
             <p className="win-player-name">{player.player}</p>
@@ -136,8 +143,16 @@ function WinSquare(props: WinSquareProps) {
         </li>
     );
     return (
-        <td className="winSquare">
+        <td className="aliveSquare">
             <ul>{playerList}</ul>
         </td>
+    );
+}
+
+// ----------------------------------------------
+
+function EliminatedSquare() {
+    return (
+        <td className="eliminatedSquare"></td>
     );
 }

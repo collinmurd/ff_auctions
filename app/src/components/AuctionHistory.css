@@ -46,7 +46,7 @@ td {
 
 /* WinSquare */
 
-.winSquare {
+.aliveSquare {
     padding: 0 10px;
 }
 
@@ -57,6 +57,12 @@ td {
 .win-player-amount {
     float: right;
     margin-left: 20px;
+}
+
+/* EliminatedSquare */
+
+.eliminatedSquare {
+    background-color: darkgray;
 }
 
 ul {
