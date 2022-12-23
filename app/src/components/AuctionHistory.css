@@ -26,10 +26,13 @@ td {
 }
 
 /* AuctionTableInput */
-.auctionTableInput label {
-    margin: 0 20px;
+#auctionTableInput label {
+    margin-right: 20px;
 }
 
+.auctionTableInputField {
+    margin: 0 10px;
+}
 
 /* WeekSquare */
 .weekSquare {
