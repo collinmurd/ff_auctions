@@ -1,6 +1,12 @@
 
+.sidescrollTable {
+    position: relative;
+    overflow-x: scroll;
+}
+
 table {
     border: 1px solid red;
+    border-spacing: 0;
     width: 100%;
     margin: 0 auto;
 }
@@ -25,8 +31,12 @@ td {
 }
 
 /* ManagerSquare */
-.managerSquare {
+.managerSquare, .spacer-square {
     min-width: 150px;
+    left: 0px;
+    background-color: white;
+    position: sticky;
+    position: -webkit-sticky;
 }
 
 .managerSquare p {
@@ -35,6 +45,10 @@ td {
 }
 
 /* WinSquare */
+
+.winSquare {
+    padding: 0 10px;
+}
 
 .win-player-name {
     display: inline-block;

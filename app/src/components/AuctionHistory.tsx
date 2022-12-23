@@ -16,7 +16,7 @@ const data = {
             ],
             [
                 {player: 'Nick Chubb', amount: 400},
-                {player: 'Nick Chubb', amount: 400}
+                {player: 'Justin Jefferson', amount: 400}
             ],
             [
                 {player: 'Nick Chubb', amount: 400}
@@ -60,10 +60,12 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
         return (
             <div>
                 <h2>Auction History</h2>
-                <table>
-                    <thead>{this.weekRow()}</thead>
-                    <tbody>{this.managerRows()}</tbody>
-                </table>
+                <div className="sidescrollTable">
+                    <table>
+                        <thead>{this.weekRow()}</thead>
+                        <tbody>{this.managerRows()}</tbody>
+                    </table>
+                </div>
             </div>
         );
     }
@@ -75,7 +77,7 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
         }
         return (
             <tr>
-                <th></th>
+                <th className="spacer-square"></th>
                 {squares}
             </tr>
         );
@@ -84,7 +86,6 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
     managerRows() {
         let rows = [];
         for (let [manager, managerData] of Object.entries(data)) {
-            console.log(Object.entries(managerData.auctions))
             let squares = managerData.auctions.map((players) => {
                 return <WinSquare manager={manager} players={players} />
             });
@@ -135,7 +136,7 @@ function WinSquare(props: WinSquareProps) {
         </li>
     );
     return (
-        <td>
+        <td className="winSquare">
             <ul>{playerList}</ul>
         </td>
     );
