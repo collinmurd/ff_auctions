@@ -18,7 +18,7 @@ const data = {
             ],
             [
                 {player: 'Nick Chubb', amount: 400},
-                {player: 'Justin Jefferson', amount: 400}
+                {player: 'Justin Jefferson', amount: 500}
             ],
             [
                 {player: 'Nick Chubb', amount: 400}
@@ -60,7 +60,7 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
 
     render() {
         return (
-            <div>
+            <div className="auctionHistory">
                 <h2>Auction History</h2>
                 <div className="sidescrollTable">
                     <table>
@@ -136,7 +136,9 @@ type AliveSquareProps = {
     players: {player: string, amount: number}[]
 }
 function AliveSquare(props: AliveSquareProps) {
-    const playerList = props.players.map((player) =>
+    const playerList = props.players.sort((player1, player2) => {
+        return player2.amount - player1.amount;
+    }).map((player) =>
         <li key={player.player}>
             <p className="win-player-name">{player.player}</p>
             <p className="win-player-amount">${player.amount}</p>
