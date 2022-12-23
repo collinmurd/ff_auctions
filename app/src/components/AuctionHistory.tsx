@@ -144,14 +144,32 @@ class AuctionTableInput extends React.Component<AuctionTableInputProps, AuctionT
                 <label>Manager Sort:
                     <select className="auctionTableInputField" value={this.state.managerSort} onChange={this.handleManagerSortChange}>
                         <option value="cashDecreasing" selected>Remaining Cash Decreasing</option>
-                        <option value="cashIncreasing" selected>Remaining Cash Increasing</option>
+                        <option value="cashIncreasing">Remaining Cash Increasing</option>
                     </select>
                 </label>
                 <label>Player Filter:
-                    <input className="auctionTableInputField" type="text" onChange={this.handlePlayerFilterChange}/>
+                    {/* <input className="auctionTableInputField" type="text" onChange={this.handlePlayerFilterChange}/> */}
+                    <select className="auctionTableInputField" value={this.state.playerFilter} onChange={this.handlePlayerFilterChange}>
+                        <option value="" selected></option>
+                        {this.getAllPlayers()}
+                    </select>
                 </label>
             </form>
         );
+    }
+
+    getAllPlayers() {
+        let allPlayers = new Set<JSX.Element>();
+        Object.values(data).forEach((val) => {
+            val.auctions.forEach((auction) => {
+                for (let win of auction) {
+                    allPlayers.add(
+                        <option value={win.player} key={win.player}>{win.player}</option>
+                    );
+                }
+            });
+        });
+        return Array.from(allPlayers);
     }
 }
 
