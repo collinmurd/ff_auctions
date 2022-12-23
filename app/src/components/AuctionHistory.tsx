@@ -62,11 +62,14 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
         return (
             <div className="auctionHistory">
                 <h2>Auction History</h2>
-                <div className="sidescrollTable">
-                    <table>
-                        <thead>{this.weekRow()}</thead>
-                        <tbody>{this.managerRows()}</tbody>
-                    </table>
+                <div className="auctionTableAndInput">
+                    <AuctionTableInput />
+                    <div className="sidescrollTable">
+                        <table>
+                            <thead>{this.weekRow()}</thead>
+                            <tbody>{this.managerRows()}</tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         );
@@ -104,6 +107,51 @@ export class AuctionHistory extends React.Component<AuctionHistoryTypes> {
             );
         }
         return rows;
+    }
+}
+
+// ----------------------------------------------
+
+type AuctionTableInputProps = {};
+const managerSortOptions = ['cashIncreasing', 'cashDecreasing', 'eliminatedIncreasing', 'eliminatedDecreastin'];
+type AuctionTableInputState = {
+    managerSort: typeof managerSortOptions[number], // extract type from `managerSortOptions`
+    playerFilter: string;
+};
+class AuctionTableInput extends React.Component<AuctionTableInputProps, AuctionTableInputState> {
+    constructor() {
+        super({});
+        this.state = {
+            managerSort: 'cashDecreasing',
+            playerFilter: ''
+        };
+
+        this.handleManagerSortChange = this.handleManagerSortChange.bind(this);
+        this.handlePlayerFilterChange = this.handlePlayerFilterChange.bind(this);
+    }
+
+    handleManagerSortChange(event: any) {
+        this.setState({managerSort: event.target.value})
+    }
+
+    handlePlayerFilterChange(event: any) {
+        this.setState({playerFilter: event.target.value})
+    }
+
+    render() {
+        return (
+            <form id="auctionTableInput">
+                <label>Manager Sort:
+                    <select value={this.state.managerSort} onChange={this.handleManagerSortChange}>
+                        <option value="cashDecreasing" selected>Remaining Cash Decreasing</option>
+                        <option value="cashIncreasing" selected>Remaining Cash Increasing</option>
+                    </select>
+                </label>
+                <label>Player Filter:
+                    <input type="text" onChange={this.handlePlayerFilterChange}/>
+                </label>
+            </form>
+        );
     }
 }
 

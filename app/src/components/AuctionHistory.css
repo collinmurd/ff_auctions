@@ -9,9 +9,9 @@
     overflow-x: scroll;
 }
 
-table {
+.auctionTableAndInput {
     border-spacing: 0;
-    margin: 20px 0;
+    margin: 30px 0;
 }
 
 th {
@@ -24,6 +24,12 @@ td {
     border-bottom: 1px solid black;
     border-left: 1px solid black;
 }
+
+/* AuctionTableInput */
+.auctionTableInput label {
+    margin: 0 20px;
+}
+
 
 /* WeekSquare */
 .weekSquare {
