@@ -45,6 +45,7 @@ export class Auction extends React.Component<AuctionProps> {
                     <AuctionPositionSection position="K" players={this.getPlayersByPosition("K")} />
                     <AuctionPositionSection position="DEF" players={this.getPlayersByPosition("DEF")} />
                 </div>
+                <button id="auctionSubmit">Submit</button>
             </div>
         );
     }
