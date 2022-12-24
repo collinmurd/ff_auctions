@@ -63,6 +63,9 @@ export class AuctionHistory extends React.Component<AuctionHistoryProps, Auction
             managerSort: 'cashDecreasing',
             playerFilter: ''
         }
+
+        this.managerSortOnChange= this.managerSortOnChange.bind(this);
+        this.playerFilterOnChange= this.playerFilterOnChange.bind(this);
     }
 
     managerSortOnChange(value: string) {
@@ -88,7 +91,7 @@ export class AuctionHistory extends React.Component<AuctionHistoryProps, Auction
                     <div className="sidescrollTable">
                         <table>
                             <thead>{this.weekRow()}</thead>
-                            <tbody>{this.managerRows()}</tbody>
+                            <tbody>{this.managerRows(this.state.managerSort, this.state.playerFilter)}</tbody>
                         </table>
                     </div>
                 </div>
@@ -109,9 +112,14 @@ export class AuctionHistory extends React.Component<AuctionHistoryProps, Auction
         );
     }
 
-    managerRows() {
-        let rows = [];
-        for (let [manager, managerData] of Object.entries(data)) {
+    managerRows(managerSort: string, playerFilter: string) {
+        let rows: JSX.Element[] = [];
+        Object.entries(data).sort((manager1, manager2) => {
+            if (managerSort == "cashIncreasing")
+                return manager1[1].amountRemaining - manager2[1].amountRemaining
+            else
+                return manager2[1].amountRemaining - manager1[1].amountRemaining
+        }).forEach(([manager, managerData]) => {
             let squares = [];
             for (let week = 1; week < currentWeek; week++) {
                 if (managerData.weekEliminated && managerData.weekEliminated <= week) {
@@ -126,7 +134,7 @@ export class AuctionHistory extends React.Component<AuctionHistoryProps, Auction
                     {squares}
                 </tr>
             );
-        }
+        });
         return rows;
     }
 }
