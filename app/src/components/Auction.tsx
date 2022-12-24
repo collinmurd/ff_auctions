@@ -32,7 +32,7 @@ export class Auction extends React.Component<AuctionProps> {
 type AuctionPositionSectionProps = {
     position: string
 };
-export class AuctionPositionSection extends React.Component<AuctionPositionSectionProps> {
+class AuctionPositionSection extends React.Component<AuctionPositionSectionProps> {
     constructor(props: AuctionPositionSectionProps) {
         super(props);
     }
@@ -41,7 +41,31 @@ export class AuctionPositionSection extends React.Component<AuctionPositionSecti
         return (
             <div className="auctionPositionSection">
                 <h3>{this.props.position}</h3>
-                <p>No players</p>
+                <AuctionPlayerCard playerName="Nick Chubb" />
+                <AuctionPlayerCard playerName="Justin Jefferson" />
+            </div>
+        );
+    }
+}
+
+// ----------------------------------------------
+
+type AuctionPlayerCardProps = {
+    playerName: string
+}
+class AuctionPlayerCard extends React.Component<AuctionPlayerCardProps> {
+    constructor(props: AuctionPlayerCardProps) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className="auctionPlayerCard">
+                <p><strong>{this.props.playerName}</strong></p>
+                <p><a href="/history">See past auctions</a></p>
+                <label>Your Bid: $
+                    <input type="number" placeholder="0" />
+                </label>
             </div>
         );
     }
