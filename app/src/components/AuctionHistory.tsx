@@ -165,7 +165,6 @@ class AuctionTableInput extends React.Component<AuctionTableInputProps> {
                     </select>
                 </label>
                 <label>Player Filter:
-                    {/* <input className="auctionTableInputField" type="text" onChange={this.handlePlayerFilterChange}/> */}
                     <select className="auctionTableInputField" value={this.props.playerFilter} onChange={this.handlePlayerFilterChange}>
                         <option value="" selected></option>
                         {this.getAllPlayers()}
