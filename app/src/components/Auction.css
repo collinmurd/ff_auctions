@@ -40,8 +40,10 @@
     float: right;
     background-color: #782951;
     color: white;
+    border-radius: 3px;
 }
 
 #auctionSubmit:hover {
     cursor: pointer;
+    background-color: #581f3b;
 }
