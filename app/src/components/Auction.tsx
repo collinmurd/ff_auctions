@@ -2,7 +2,7 @@
 
 import './Auction.css'
 
-import React from "react";
+import React, { MouseEventHandler } from "react";
 
 const data = [
     {
@@ -28,9 +28,22 @@ const data = [
 ];
 
 type AuctionProps = {};
-export class Auction extends React.Component<AuctionProps> {
+type AuctionState = {
+    modalActive: boolean
+};
+export class Auction extends React.Component<AuctionProps, AuctionState> {
     constructor(props: AuctionProps) {
         super(props);
+
+        this.state = {
+            modalActive: false
+        }
+
+        this.toggleModal = this.toggleModal.bind(this);
+    }
+
+    toggleModal() {
+        this.setState({modalActive: !this.state.modalActive})
     }
 
     render() {
@@ -45,7 +58,8 @@ export class Auction extends React.Component<AuctionProps> {
                     <AuctionPositionSection position="K" players={this.getPlayersByPosition("K")} />
                     <AuctionPositionSection position="DEF" players={this.getPlayersByPosition("DEF")} />
                 </div>
-                <button id="auctionSubmit">Submit</button>
+                <button id="auctionSubmit" className="button" onClick={this.toggleModal}>Submit</button>
+                <AuctionSubmitModal active={this.state.modalActive} toggle={this.toggleModal} />
             </div>
         );
     }
@@ -107,5 +121,31 @@ class AuctionPlayerCard extends React.Component<AuctionPlayerCardProps> {
                 </label>
             </div>
         );
+    }
+}
+
+// ----------------------------------------------
+
+type AuctionSubmitModalProps = {
+    active: boolean,
+    toggle: MouseEventHandler
+};
+class AuctionSubmitModal extends React.Component<AuctionSubmitModalProps> {
+    constructor(props: AuctionSubmitModalProps) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div id="auctionSubmitModal" className={this.props.active? "modal modalActive": "modal"}>
+                <div className="modalContent">
+                    <h2>Confirm your bids:</h2>
+                    <p>Nick Chubb: $20</p>
+                    <div id="confirmBidsButtonContainer">
+                        <button id="confirmBidsButton" className="button" onClick={this.props.toggle}>Confirm</button>
+                    </div>
+                </div>
+            </div>
+        )
     }
 }
