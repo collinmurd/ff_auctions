@@ -125,7 +125,15 @@ export class AuctionHistory extends React.Component<AuctionHistoryProps, Auction
                 if (managerData.weekEliminated && managerData.weekEliminated <= week) {
                     squares.push(<EliminatedSquare />)
                 } else {
-                    squares.push(<AliveSquare manager={manager} players={managerData.auctions[week - 1]}/>)
+                    let players: {player: string, amount: number}[] = [];
+                    if (playerFilter != "") {
+                        players = managerData.auctions[week - 1].filter((win) => {
+                            return win.player == playerFilter;
+                        });
+                    } else {
+                        players = managerData.auctions[week - 1];
+                    }
+                    squares.push(<AliveSquare manager={manager} players={players}/>)
                 }
             }
             rows.push(
@@ -183,17 +191,17 @@ class AuctionTableInput extends React.Component<AuctionTableInputProps> {
     }
 
     getAllPlayers() {
-        let allPlayers = new Set<JSX.Element>();
+        let allPlayers = new Set<string>();
         Object.values(data).forEach((val) => {
             val.auctions.forEach((auction) => {
                 for (let win of auction) {
-                    allPlayers.add(
-                        <option value={win.player} key={win.player}>{win.player}</option>
-                    );
+                    allPlayers.add(win.player);
                 }
             });
         });
-        return Array.from(allPlayers);
+        return Array.from(allPlayers).map((playerName) => {
+            return <option value={playerName} key={playerName}>{playerName}</option>
+        });
     }
 }
 

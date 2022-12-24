@@ -41,7 +41,7 @@ export class Header extends React.Component<HeaderProps> {
                     <h1 className="title">Auction Portal</h1>
                     <div className="userInfo">
                         <h3>{this.props.user.name}</h3>
-                        <h5>Cash Remaining: ${this.props.user.balance}</h5>
+                        <h5>Remaining Cash: ${this.props.user.balance}</h5>
                     </div>
                 </div>
                 <Nav />
