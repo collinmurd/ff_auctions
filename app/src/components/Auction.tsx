@@ -2,7 +2,7 @@
 
 import './Auction.css'
 
-import React, { ChangeEventHandler, MouseEventHandler } from "react";
+import React, { MouseEventHandler } from "react";
 
 const data = [
     {
@@ -27,10 +27,15 @@ const data = [
     }
 ];
 
+type Bid = {
+    playerName: string,
+    amount: number
+};
+
 type AuctionProps = {};
 type AuctionState = {
     modalActive: boolean,
-    bids: {playerName: string, amount: number}[]
+    bids: Bid[]
 };
 export class Auction extends React.Component<AuctionProps, AuctionState> {
     positions: string[];
@@ -39,7 +44,9 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
 
         this.state = {
             modalActive: false,
-            bids: []
+            bids: data.map(player => {
+                return {playerName: player.playerName, amount: 0}
+            })
         };
 
         this.positions = ["QB", "WR", "RB", "TE", "K", "DEF"];
@@ -52,11 +59,17 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
         this.setState({modalActive: !this.state.modalActive});
     }
 
-    setBids(bid: {playerName: string, amount: number}) {
+    setBids(bid: Bid) {
         console.log(`bid change: ${JSON.stringify(bid)}`)
-        this.setState(prevState => ({
-            bids: [...prevState.bids, bid]
-        }));
+        this.setState(prevState => {
+            for (let i = 0; i < prevState.bids.length; i++) {
+                if (prevState.bids[i].playerName == bid.playerName) {
+                    prevState.bids[i].amount = bid.amount;
+                    return {bids: prevState.bids};
+                }
+            }
+            return {bids: [...prevState.bids, bid]};
+        });
     }
 
     render() {
@@ -67,7 +80,11 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
                     {this.getAuctionPositionSections()}
                 </div>
                 <button id="auctionSubmit" className="button" onClick={this.toggleModal}>Submit</button>
-                <AuctionSubmitModal active={this.state.modalActive} toggle={this.toggleModal} />
+                <AuctionSubmitModal
+                    active={this.state.modalActive}
+                    toggle={this.toggleModal}
+                    bids={this.state.bids}
+                />
             </div>
         );
     }
@@ -99,7 +116,7 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
 type AuctionPositionSectionProps = {
     position: string,
     players: string[],
-    bidUpdate: {(bid: {playerName: string, amount: number}): void}
+    bidUpdate: {(bid: Bid): void}
 };
 class AuctionPositionSection extends React.Component<AuctionPositionSectionProps> {
     playerCardElements: JSX.Element[];
@@ -127,7 +144,7 @@ class AuctionPositionSection extends React.Component<AuctionPositionSectionProps
 
 type AuctionPlayerCardProps = {
     playerName: string,
-    bidUpdate: {(bid: {playerName: string, amount: number}): void}
+    bidUpdate: {(bid: Bid): void}
 }
 class AuctionPlayerCard extends React.Component<AuctionPlayerCardProps> {
     constructor(props: AuctionPlayerCardProps) {
@@ -160,6 +177,7 @@ class AuctionPlayerCard extends React.Component<AuctionPlayerCardProps> {
 
 type AuctionSubmitModalProps = {
     active: boolean,
+    bids: Bid[],
     toggle: MouseEventHandler
 };
 class AuctionSubmitModal extends React.Component<AuctionSubmitModalProps> {
@@ -172,12 +190,22 @@ class AuctionSubmitModal extends React.Component<AuctionSubmitModalProps> {
             <div id="auctionSubmitModal" className={this.props.active? "modal modalActive": "modal"}>
                 <div className="modalContent">
                     <h2>Confirm your bids:</h2>
-                    <p>Nick Chubb: $20</p>
+                    <ul>
+                        {this.getBids()}
+                    </ul>
                     <div id="confirmBidsButtonContainer">
                         <button id="confirmBidsButton" className="button" onClick={this.props.toggle}>Confirm</button>
                     </div>
                 </div>
             </div>
         )
+    }
+
+    getBids() {
+        return this.props.bids
+        .filter(bid => bid.amount > 0)
+        .map(bid => {
+            return <li key={bid.playerName}>{bid.playerName}: ${bid.amount}</li>
+        })
     }
 }

@@ -44,3 +44,7 @@
 #confirmBidsButton {
     float: right;
 }
+
+#auctionSubmitModal ul {
+    margin: 20px;
+}
