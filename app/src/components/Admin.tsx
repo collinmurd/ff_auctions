@@ -9,6 +9,20 @@ const seasons = [
     "2021-2022"
 ]
 
+const managers: {[season: string]: string[]} = {
+    "2022-2023": [
+        "Collin",
+        "Spencer",
+        "Cyrus",
+        "Ric"
+    ],
+    "2021-2022": [
+        "Collin",
+        "Spencer",
+        "Nick"
+    ]
+}
+
 type AdminProps = {};
 type AdminState = {
     season: string
@@ -33,6 +47,9 @@ export class Admin extends React.Component<AdminProps, AdminState> {
             <div id="admin">
                 <h2>Admin Settings</h2>
                 <AdminSeasonSelect season={this.state.season} updateSeason={this.handleSeasonChange}/>
+                <div id="adminSettings">
+                    <ManageManagers season={this.state.season} />
+                </div>
             </div>
         );
     }
@@ -73,5 +90,44 @@ class AdminSeasonSelect extends React.Component<AdminSeasonSelectProps> {
                 <option value={season} key={season}>{season}</option>
             )
         ];
+    }
+}
+
+// ----------------------------------------------
+
+type ManageManagersProps = {
+    season: string
+};
+class ManageManagers extends React.Component<ManageManagersProps> {
+    constructor(props: ManageManagersProps) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div id="manageManagers">
+                <h4><strong>Manage Managers</strong></h4>
+                <table>
+                    <tbody>
+                        {this.getManagers()}
+                        <tr>
+                            <td><span className="clickableSpan">+ Add New Player</span></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
+
+    getManagers() {
+        return managers[this.props.season].map(manager =>
+            <tr key={manager}>
+                <td>{manager}</td>
+                <td><span className="clickableSpan">rename</span></td>
+                <td><span className="clickableSpan">delete</span></td>
+            </tr>
+        );
     }
 }

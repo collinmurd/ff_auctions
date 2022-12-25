@@ -13,14 +13,14 @@
     border-spacing: 0;
 }
 
-th {
+.auctionTableAndInput th {
     font-weight: bold;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
     padding: 10px;
 }
 
-td {
+.auctionTableAndInput td {
     border-bottom: 1px solid black;
     border-right: 1px solid black;
 }
