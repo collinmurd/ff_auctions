@@ -11,7 +11,7 @@ export class Admin extends React.Component {
 
     render() {
         return (
-            <h2>This is where admin settings go</h2>
+            <h2>Admin Settings</h2>
         );
     }
 }
