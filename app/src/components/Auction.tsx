@@ -2,7 +2,7 @@
 
 import './Auction.css'
 
-import React, { MouseEventHandler } from "react";
+import React, { ChangeEventHandler, MouseEventHandler } from "react";
 
 const data = [
     {
@@ -29,21 +29,34 @@ const data = [
 
 type AuctionProps = {};
 type AuctionState = {
-    modalActive: boolean
+    modalActive: boolean,
+    bids: {playerName: string, amount: number}[]
 };
 export class Auction extends React.Component<AuctionProps, AuctionState> {
+    positions: string[];
     constructor(props: AuctionProps) {
         super(props);
 
         this.state = {
-            modalActive: false
-        }
+            modalActive: false,
+            bids: []
+        };
+
+        this.positions = ["QB", "WR", "RB", "TE", "K", "DEF"];
 
         this.toggleModal = this.toggleModal.bind(this);
+        this.setBids = this.setBids.bind(this);
     }
 
     toggleModal() {
-        this.setState({modalActive: !this.state.modalActive})
+        this.setState({modalActive: !this.state.modalActive});
+    }
+
+    setBids(bid: {playerName: string, amount: number}) {
+        console.log(`bid change: ${JSON.stringify(bid)}`)
+        this.setState(prevState => ({
+            bids: [...prevState.bids, bid]
+        }));
     }
 
     render() {
@@ -51,17 +64,25 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
             <div className="auction">
                 <h2>Submit Your Bids</h2>
                 <div className="auctionSectionContainer">
-                    <AuctionPositionSection position="QB" players={this.getPlayersByPosition("QB")} />
-                    <AuctionPositionSection position="WR" players={this.getPlayersByPosition("WR")} />
-                    <AuctionPositionSection position="RB" players={this.getPlayersByPosition("RB")} />
-                    <AuctionPositionSection position="TE" players={this.getPlayersByPosition("TE")} />
-                    <AuctionPositionSection position="K" players={this.getPlayersByPosition("K")} />
-                    <AuctionPositionSection position="DEF" players={this.getPlayersByPosition("DEF")} />
+                    {this.getAuctionPositionSections()}
                 </div>
                 <button id="auctionSubmit" className="button" onClick={this.toggleModal}>Submit</button>
                 <AuctionSubmitModal active={this.state.modalActive} toggle={this.toggleModal} />
             </div>
         );
+    }
+
+    getAuctionPositionSections() {
+        return this.positions.map(position => {
+            return (
+                <AuctionPositionSection
+                    position={position}
+                    players={this.getPlayersByPosition(position)}
+                    bidUpdate={this.setBids}
+                    key={position}
+                />
+            )
+        });
     }
 
     getPlayersByPosition(position: string) {
@@ -77,7 +98,8 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
 
 type AuctionPositionSectionProps = {
     position: string,
-    players: string[]
+    players: string[],
+    bidUpdate: {(bid: {playerName: string, amount: number}): void}
 };
 class AuctionPositionSection extends React.Component<AuctionPositionSectionProps> {
     playerCardElements: JSX.Element[];
@@ -85,7 +107,7 @@ class AuctionPositionSection extends React.Component<AuctionPositionSectionProps
         super(props);
 
         this.playerCardElements = this.props.players.map((player) => {
-            return <AuctionPlayerCard playerName={player} key={player} />
+            return <AuctionPlayerCard playerName={player} key={player} bidUpdate={this.props.bidUpdate} />
         });
     }
 
@@ -104,11 +126,21 @@ class AuctionPositionSection extends React.Component<AuctionPositionSectionProps
 // ----------------------------------------------
 
 type AuctionPlayerCardProps = {
-    playerName: string
+    playerName: string,
+    bidUpdate: {(bid: {playerName: string, amount: number}): void}
 }
 class AuctionPlayerCard extends React.Component<AuctionPlayerCardProps> {
     constructor(props: AuctionPlayerCardProps) {
         super(props);
+
+        this.handleBidUpdate = this.handleBidUpdate.bind(this);
+    }
+
+    handleBidUpdate(event: React.ChangeEvent<HTMLInputElement>) {
+        this.props.bidUpdate({
+            playerName: this.props.playerName,
+            amount: parseInt(event.target.value)
+        });
     }
 
     render() {
@@ -117,7 +149,7 @@ class AuctionPlayerCard extends React.Component<AuctionPlayerCardProps> {
                 <p><strong>{this.props.playerName}</strong></p>
                 <p><a href="/history">See past auctions</a></p>
                 <label>Your Bid: $
-                    <input type="number" placeholder="0" />
+                    <input type="number" placeholder="0" onChange={this.handleBidUpdate} />
                 </label>
             </div>
         );

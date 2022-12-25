@@ -81,6 +81,7 @@ h4 {
     margin: 100px auto;
     padding: 50px;
     line-height: 2em;
+    border-radius: 3px;
 }
 
 .modal.modalInactive {
