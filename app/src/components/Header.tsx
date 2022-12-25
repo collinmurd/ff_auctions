@@ -12,6 +12,7 @@ class Nav extends React.Component {
             <ul>
                 <li><NavLink to='/'>Submit Bids</NavLink></li>
                 <li><NavLink to='/history'>Auction History</NavLink></li>
+                <li><NavLink to='/admin'>Admin</NavLink></li>
             </ul>
         </nav>
     }

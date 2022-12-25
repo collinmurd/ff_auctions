@@ -2,6 +2,7 @@
 import { Route, Routes } from 'react-router-dom';
 
 import './App.css'
+import { Admin } from './Admin';
 import { Auction } from './Auction';
 import { AuctionHistory } from './AuctionHistory';
 import { Header } from './Header';
@@ -30,6 +31,7 @@ function Main() {
         <Routes>
             <Route index element={<Auction />} />
             <Route path='/history' element={<AuctionHistory />} />
+            <Route path='/admin' element={<Admin />} />
         </Routes>
     );
 }
