@@ -1,0 +1,11 @@
+
+/* AdminSeasonSelect */
+
+#adminSeasonSelect {
+    margin: 20px 0;
+}
+
+#adminSeasonSelect select {
+    width: 180px;
+    font-size: 16px;
+}
