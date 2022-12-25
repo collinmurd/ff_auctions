@@ -23,6 +23,9 @@ const managers: {[season: string]: string[]} = {
     ]
 }
 
+const currentWeek = 4;
+const existingAuction = false;
+
 type AdminProps = {};
 type AdminState = {
     season: string
@@ -49,6 +52,7 @@ export class Admin extends React.Component<AdminProps, AdminState> {
                 <AdminSeasonSelect season={this.state.season} updateSeason={this.handleSeasonChange}/>
                 <div id="adminSettings">
                     <ManageManagers season={this.state.season} />
+                    <ManageAuctions currentWeek={currentWeek} existingAuction={existingAuction} />
                 </div>
             </div>
         );
@@ -113,7 +117,6 @@ class ManageManagers extends React.Component<ManageManagersProps> {
                         <tr>
                             <td><span className="clickableSpan">+ Add New Player</span></td>
                             <td></td>
-                            <td></td>
                         </tr>
                     </tbody>
                 </table>
@@ -125,9 +128,37 @@ class ManageManagers extends React.Component<ManageManagersProps> {
         return managers[this.props.season].map(manager =>
             <tr key={manager}>
                 <td>{manager}</td>
-                <td><span className="clickableSpan">rename</span></td>
                 <td><span className="clickableSpan">delete</span></td>
             </tr>
         );
+    }
+}
+
+// ----------------------------------------------
+
+type ManageAuctionsProps = {
+    currentWeek: number,
+    existingAuction: boolean
+};
+class ManageAuctions extends React.Component<ManageAuctionsProps> {
+    constructor(props: ManageAuctionsProps) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div id="manageAuctions">
+                <h4><strong>Manage Auctions</strong></h4>
+                {this.getOpenOrCloseOption()}
+            </div>
+        );
+    }
+
+    getOpenOrCloseOption() {
+        if (this.props.existingAuction) {
+            return <button className="button">Close current auction</button>
+        } else {
+            return <button className="button">Open auction for Week {this.props.currentWeek}</button>
+        }
     }
 }

@@ -17,6 +17,7 @@
 /* ManageManagers */
 
 #manageManagers table {
+    margin: 10px;
     border-top: 1px solid black;
     border-spacing: 0;
 }
@@ -33,4 +34,14 @@
 
 .clickableSpan:hover {
     cursor: pointer;
+}
+
+/* ManageAuctions */
+
+#manageAuctions {
+    margin-top: 40px;
+}
+
+#manageAuctions button {
+    margin: 10px;
 }
