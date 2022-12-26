@@ -1,47 +1,8 @@
 
-/* AdminSeasonSelect */
-
-#adminSeasonSelect {
-    margin: 20px 0;
+#admin .button {
+    width: 200px;
 }
 
-#adminSeasonSelect select {
-    width: 180px;
-    font-size: 16px;
-}
-
-#adminSettings {
-    margin: 50px 30px;
-}
-
-/* ManageManagers */
-
-#manageManagers table {
-    margin: 10px;
-    border-top: 1px solid black;
-    border-spacing: 0;
-}
-
-#manageManagers td {
-    border-bottom: 1px solid black;
-    padding: 5px;
-}
-
-.clickableSpan {
-    color: blue;
-    text-decoration: underline;
-}
-
-.clickableSpan:hover {
-    cursor: pointer;
-}
-
-/* ManageAuctions */
-
-#manageAuctions {
-    margin-top: 40px;
-}
-
-#manageAuctions button {
-    margin: 10px;
+#admin .buttonContainer {
+    margin: 30px 10px;
 }
