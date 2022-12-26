@@ -49,15 +49,15 @@ export class Admin extends React.Component<AdminProps, AdminState> {
 
     seasonButton() {
         if (currentSeason)
-            return <button id="createSeasonButton" className="button">Create New Season</button>
-        else
             return <button id="endSeasonButton" className="button">End Current Season</button>
+        else
+            return <button id="createSeasonButton" className="button">Create New Season</button>
     }
 
     auctionButton() {
-        if (currentSeason)
-            return <button id="createAuctionButton" className="button">Create New Auction</button>
-        else
+        if (existingAuction)
             return <button id="endAuctionButton" className="button">End Current Auction</button>
+        else
+            return <button id="createAuctionButton" className="button">Create New Auction</button>
     }
 }
