@@ -2,23 +2,9 @@
 
 import './Admin.css'
 
-import React, {MouseEventHandler} from "react";
+import React from "react";
 
 import { Modal } from './SharedComponents';
-
-const managers: {[season: string]: string[]} = {
-    "2022-2023": [
-        "Collin",
-        "Spencer",
-        "Cyrus",
-        "Ric"
-    ],
-    "2021-2022": [
-        "Collin",
-        "Spencer",
-        "Nick"
-    ]
-}
 
 const currentSeason = "2022-2023"; // can be null. that would indicate there is no current season
 const currentWeek = 4; // can be null. indicates same as above
