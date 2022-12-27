@@ -87,6 +87,7 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
                         <ul>
                             {this.getBids()}
                         </ul>
+                        <button className="button" onClick={this.toggleModal}>Submit</button>
                     </div>
                 </Modal>
             </div>
