@@ -2,3 +2,35 @@
 #admin .settingContainer {
     margin: 30px 10px;
 }
+
+#endSeason form {
+    margin: 30px 20px;
+}
+
+#endSeason #managerInput {
+    margin: 20px 0;
+}
+
+#endSeason #managerInput .managerInputField {
+    height: 20px;
+    vertical-align: middle;
+}
+
+#endSeason #managerInput .removeManagerButton {
+    vertical-align: middle;
+    margin-left: 10px;
+    min-width: 0;
+    height: auto;
+}
+
+#endSeason #managerInput #addAnotherManagerButton {
+    margin-top: 10px;
+}
+
+#endSeason .submitButtonContainer {
+    overflow: hidden;
+}
+
+#endSeason .submitButtonContainer button {
+    float: right;
+}

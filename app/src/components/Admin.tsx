@@ -93,6 +93,7 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         this.handleManagerInputChange = this.handleManagerInputChange.bind(this);
         this.handleAddAnotherManagerClick = this.handleAddAnotherManagerClick.bind(this);
         this.handleRemoveManagerClick = this.handleRemoveManagerClick.bind(this);
+        this.handleSubmitNewSeason = this.handleSubmitNewSeason.bind(this);
     }
 
     toggleModal() {
@@ -133,22 +134,35 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         event.preventDefault();
     }
 
+    handleSubmitNewSeason(event: any) {
+        this.toggleModal();
+        event.preventDefault();
+    }
+
     render() {
         return (
             <div id="endSeason">
                 <button id="endSeasonButton" className="button" onClick={this.handleCreateSeason}>Start a new Season</button>
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} >
-                    <h2>Start a new Season</h2>
+                    <h2>Start a new season</h2>
                     <form>
-                        <label>What NFL Season is it? (i.e. "2019-2020"):
-                            <input type="text" value={this.state.seasonInput} onChange={this.handleSeasonInputChange} />
-                        </label>
+                        <div>
+                            <h5>What NFL Season is it? (i.e. "2019-2020"):</h5>
+                            <input
+                                type="text"
+                                value={this.state.seasonInput}
+                                onChange={this.handleSeasonInputChange}
+                                placeholder="2019-2020" />
+                        </div>
                         <div id="managerInput">
-                            <h4>Input Manager names:</h4>
+                            <h5>Input Manager names:</h5>
                             {this.managerInputs()}
                             <div>
-                                <button className="button" onClick={this.handleAddAnotherManagerClick}>+ Add Another Manager</button>
+                                <button id="addAnotherManagerButton" className="button" onClick={this.handleAddAnotherManagerClick}>+ Add Another Manager</button>
                             </div>
+                        </div>
+                        <div className="submitButtonContainer">
+                            <button className="button" onClick={this.handleSubmitNewSeason}>Start Season</button>
                         </div>
                     </form>
                 </Modal>
@@ -160,9 +174,14 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         let inputs: JSX.Element[] = [];
         for (let i = 0; i < this.state.managerInputs.length; i++) {
             inputs.push(
-                <div key={i}>
-                    <input type="text" value={this.state.managerInputs[i]} onChange={(e) => this.handleManagerInputChange(e, i)}/>
-                    <button className="removeManagerButton" onClick={(e) => this.handleRemoveManagerClick(e, i)}>&#10006;</button>
+                <div key={i} className="managerInputRow">
+                    <input
+                        type="text"
+                        className="managerInputField"
+                        value={this.state.managerInputs[i]}
+                        onChange={(e) => this.handleManagerInputChange(e, i)}
+                        placeholder="Firstname Lastname" />
+                    <button className="removeManagerButton button" onClick={(e) => this.handleRemoveManagerClick(e, i)}>&#10006;</button>
                 </div>
             );
         } 
