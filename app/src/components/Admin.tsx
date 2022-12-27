@@ -92,6 +92,7 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         this.handleSeasonInputChange = this.handleSeasonInputChange.bind(this);
         this.handleManagerInputChange = this.handleManagerInputChange.bind(this);
         this.handleAddAnotherManagerClick = this.handleAddAnotherManagerClick.bind(this);
+        this.handleRemoveManagerClick = this.handleRemoveManagerClick.bind(this);
     }
 
     toggleModal() {
@@ -119,6 +120,16 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         this.setState(prevState => {
             return {managerInputs: [...prevState.managerInputs, ""]};
         });
+        event.preventDefault();
+    }
+
+    handleRemoveManagerClick(event: any, index: number) {
+        console.log(`index: ${index}`)
+        this.setState(prevState => {
+            // using filter() because splice() changes the underlying array object
+            // react in strict mode calls setState twice, so splice() was deleting two inputs
+            return {managerInputs: prevState.managerInputs.filter((_, i) => i !== index)};
+        })
         event.preventDefault();
     }
 
@@ -151,6 +162,7 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
             inputs.push(
                 <div key={i}>
                     <input type="text" value={this.state.managerInputs[i]} onChange={(e) => this.handleManagerInputChange(e, i)}/>
+                    <button className="removeManagerButton" onClick={(e) => this.handleRemoveManagerClick(e, i)}>&#10006;</button>
                 </div>
             );
         } 
