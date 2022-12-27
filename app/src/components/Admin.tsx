@@ -37,14 +37,14 @@ export class Admin extends React.Component<AdminProps, AdminState> {
     settings() {
         let settings: JSX.Element[] = [];
         if (currentSeason) {
-            settings.push(<EndSeasonSetting />);
+            settings.push(<EndSeasonSetting key="endSeasonSetting" />);
             if (existingAuction) {
-                settings.push(<EndAuctionSetting />);
+                settings.push(<EndAuctionSetting key="endAuctionSetting" />);
             } else {
-                settings.push(<button id="createAuctionButton" className="button">Create New Auction</button>);
+                settings.push(<button key="createAuctionSetting" id="createAuctionButton" className="button">Create New Auction</button>);
             }
         } else {
-            settings.push(<CreateSeasonSetting />)
+            settings.push(<CreateSeasonSetting key="createSeasonSetting" />)
         }
 
         return settings;
@@ -73,18 +73,25 @@ function SeasonInfo(props: {season: string | null, week: number | null}) {
 // ----------------------------------------------
 
 type CreateSeasonSettingState = {
-    modalActive: boolean
+    modalActive: boolean,
+    seasonInput: string,
+    managerInputs: string[]
 }
 class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> {
     constructor(props: any) {
         super(props);
 
         this.state = {
-            modalActive: false
+            modalActive: false,
+            seasonInput: "",
+            managerInputs: [""]
         };
 
         this.toggleModal = this.toggleModal.bind(this);
         this.handleCreateSeason = this.handleCreateSeason.bind(this);
+        this.handleSeasonInputChange = this.handleSeasonInputChange.bind(this);
+        this.handleManagerInputChange = this.handleManagerInputChange.bind(this);
+        this.handleAddAnotherManagerClick = this.handleAddAnotherManagerClick.bind(this);
     }
 
     toggleModal() {
@@ -95,15 +102,59 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         this.toggleModal();
     }
 
+    handleSeasonInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({seasonInput: event.target.value});
+    }
+
+    handleManagerInputChange(event: React.ChangeEvent<HTMLInputElement>, index: number) {
+        this.setState(prevState => {
+            if (index < prevState.managerInputs.length) {
+                prevState.managerInputs[index] = event.target.value;
+            }
+            return prevState;
+        });
+    }
+
+    handleAddAnotherManagerClick(event: any) {
+        this.setState(prevState => {
+            return {managerInputs: [...prevState.managerInputs, ""]};
+        });
+        event.preventDefault();
+    }
+
     render() {
         return (
             <div id="endSeason">
                 <button id="endSeasonButton" className="button" onClick={this.handleCreateSeason}>Start a new Season</button>
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <h2>Start a new Season</h2>
+                    <form>
+                        <label>What NFL Season is it? (i.e. "2019-2020"):
+                            <input type="text" value={this.state.seasonInput} onChange={this.handleSeasonInputChange} />
+                        </label>
+                        <div id="managerInput">
+                            <h4>Input Manager names:</h4>
+                            {this.managerInputs()}
+                            <div>
+                                <button className="button" onClick={this.handleAddAnotherManagerClick}>+ Add Another Manager</button>
+                            </div>
+                        </div>
+                    </form>
                 </Modal>
             </div>
         );
+    }
+
+    managerInputs() {
+        let inputs: JSX.Element[] = [];
+        for (let i = 0; i < this.state.managerInputs.length; i++) {
+            inputs.push(
+                <div key={i}>
+                    <input type="text" value={this.state.managerInputs[i]} onChange={(e) => this.handleManagerInputChange(e, i)}/>
+                </div>
+            );
+        } 
+        return inputs;
     }
 }
 
