@@ -35,17 +35,6 @@ export class Admin extends React.Component<AdminProps, AdminState> {
         this.state = {
             endSeasonModalActive: false
         }
-
-        this.toggleEndSeasonModal = this.toggleEndSeasonModal.bind(this);
-        this.handleEndSeason = this.handleEndSeason.bind(this);
-    }
-
-    toggleEndSeasonModal() {
-        this.setState({endSeasonModalActive: !this.state.endSeasonModalActive});
-    }
-
-    handleEndSeason() {
-        this.toggleEndSeasonModal();
     }
 
     render() {
@@ -58,18 +47,15 @@ export class Admin extends React.Component<AdminProps, AdminState> {
                 <h4>
                     {currentWeek ? `Current Week: ${currentWeek}` : 'No Current Season'}
                 </h4>
-                <div className="buttonContainer">{this.seasonButton()}</div>
+                <div className="buttonContainer">{this.seasonSetting()}</div>
                 <div className="buttonContainer">{this.auctionButton()}</div>
-                <Modal active={this.state.endSeasonModalActive} toggle={this.toggleEndSeasonModal} exitButtonText="Confirm">
-                    <p>Are you sure you'd like to end this season?</p>
-                </Modal>
             </div>
         );
     }
 
-    seasonButton() {
+    seasonSetting() {
         if (currentSeason)
-            return <button id="endSeasonButton" className="button" onClick={this.handleEndSeason}>End Current Season</button>
+            return <EndSeasonSetting />
         else
             return <button id="createSeasonButton" className="button">Create New Season</button>
     }
@@ -79,5 +65,42 @@ export class Admin extends React.Component<AdminProps, AdminState> {
             return <button id="endAuctionButton" className="button">End Current Auction</button>
         else
             return <button id="createAuctionButton" className="button">Create New Auction</button>
+    }
+}
+
+// ----------------------------------------------
+
+type EndSeasonSettingState = {
+    modalActive: boolean
+}
+class EndSeasonSetting extends React.Component<{}, EndSeasonSettingState> {
+    constructor(props: any) {
+        super(props);
+
+        this.state = {
+            modalActive: false
+        }
+
+        this.toggleModal = this.toggleModal.bind(this);
+        this.handleEndSeason = this.handleEndSeason.bind(this);
+    }
+
+    toggleModal() {
+        this.setState({modalActive: !this.state.modalActive});
+    }
+
+    handleEndSeason() {
+        this.toggleModal();
+    }
+
+    render() {
+        return (
+            <div id="endSeason">
+                <button id="endSeasonButton" className="button" onClick={this.handleEndSeason}>End Current Season</button>
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                    <p>Are you sure you'd like to end this season?</p>
+                </Modal>
+            </div>
+        );
     }
 }
