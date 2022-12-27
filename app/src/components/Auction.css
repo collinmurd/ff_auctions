@@ -32,14 +32,6 @@
 
 /* submit modal */
 
-#confirmBidsButtonContainer {
-    overflow: hidden;
-}
-
-#confirmBidsButton {
-    float: right;
-}
-
-#auctionSubmitModal ul {
+#auctionSubmitModalContents ul {
     margin: 20px;
 }

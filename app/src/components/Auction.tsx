@@ -3,6 +3,7 @@
 import './Auction.css'
 
 import React, { MouseEventHandler } from "react";
+import { Modal } from './SharedComponents';
 
 const data = [
     {
@@ -80,13 +81,24 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
                     {this.getAuctionPositionSections()}
                 </div>
                 <button id="auctionSubmit" className="button" onClick={this.toggleModal}>Submit</button>
-                <AuctionSubmitModal
-                    active={this.state.modalActive}
-                    toggle={this.toggleModal}
-                    bids={this.state.bids}
-                />
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                    <div id="auctionSubmitModalContents">
+                        <h2>Confirm your bids:</h2>
+                        <ul>
+                            {this.getBids()}
+                        </ul>
+                    </div>
+                </Modal>
             </div>
         );
+    }
+
+    getBids() {
+        return this.state.bids
+        .filter(bid => bid.amount > 0)
+        .map(bid => {
+            return <li key={bid.playerName}>{bid.playerName}: ${bid.amount}</li>
+        })
     }
 
     getAuctionPositionSections() {
@@ -170,42 +182,5 @@ class AuctionPlayerCard extends React.Component<AuctionPlayerCardProps> {
                 </label>
             </div>
         );
-    }
-}
-
-// ----------------------------------------------
-
-type AuctionSubmitModalProps = {
-    active: boolean,
-    bids: Bid[],
-    toggle: MouseEventHandler
-};
-class AuctionSubmitModal extends React.Component<AuctionSubmitModalProps> {
-    constructor(props: AuctionSubmitModalProps) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <div id="auctionSubmitModal" className={this.props.active? "modal modalActive": "modal"}>
-                <div className="modalContent">
-                    <h2>Confirm your bids:</h2>
-                    <ul>
-                        {this.getBids()}
-                    </ul>
-                    <div id="confirmBidsButtonContainer">
-                        <button id="confirmBidsButton" className="button" onClick={this.props.toggle}>Confirm</button>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
-    getBids() {
-        return this.props.bids
-        .filter(bid => bid.amount > 0)
-        .map(bid => {
-            return <li key={bid.playerName}>{bid.playerName}: ${bid.amount}</li>
-        })
     }
 }
