@@ -35,4 +35,7 @@
 
 .modal .modalExit {
     float: right;
+    min-width: 0;
+    height: auto;
+    border: none;
 }

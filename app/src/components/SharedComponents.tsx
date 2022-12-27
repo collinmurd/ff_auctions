@@ -6,7 +6,6 @@ import React, {MouseEventHandler} from "react";
 
 type ModalProps = {
     active: boolean,
-    exitButtonText: string,
     toggle: MouseEventHandler,
     children: React.ReactNode
 };
@@ -19,10 +18,10 @@ export class Modal extends React.Component<ModalProps> {
         return (
             <div className={this.props.active? "modal modalActive": "modal"}>
                 <div className="modalContent">
-                    {this.props.children}
                     <div className="modalExitContainer">
-                        <button className="modalExit button" onClick={this.props.toggle}>{this.props.exitButtonText}</button>
+                        <button className="modalExit button" onClick={this.props.toggle}>&#10006;</button>
                     </div>
+                    {this.props.children}
                 </div>
             </div>
         )

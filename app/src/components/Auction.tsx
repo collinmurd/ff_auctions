@@ -81,7 +81,7 @@ export class Auction extends React.Component<AuctionProps, AuctionState> {
                     {this.getAuctionPositionSections()}
                 </div>
                 <button id="auctionSubmit" className="button" onClick={this.toggleModal}>Submit</button>
-                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <div id="auctionSubmitModalContents">
                         <h2>Confirm your bids:</h2>
                         <ul>

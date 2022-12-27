@@ -99,7 +99,7 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         return (
             <div id="endSeason">
                 <button id="endSeasonButton" className="button" onClick={this.handleCreateSeason}>Start a new Season</button>
-                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <h2>Start a new Season</h2>
                 </Modal>
             </div>
@@ -136,7 +136,7 @@ class EndSeasonSetting extends React.Component<{}, EndSeasonSettingState> {
         return (
             <div id="endSeason">
                 <button id="endSeasonButton" className="button" onClick={this.handleEndSeason}>End Current Season</button>
-                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <p>Are you sure you'd like to end this season?</p>
                 </Modal>
             </div>
@@ -173,7 +173,7 @@ class EndAuctionSetting extends React.Component<{}, EndAuctionSettingState> {
         return (
             <div id="endAuction">
                 <button id="endAuctionButton" className="button" onClick={this.handleEndAuction}>End Current Auction</button>
-                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <p>Are you sure you'd like to end the ongoing aution? This prevent further bids and progress the week.</p>
                 </Modal>
             </div>
