@@ -61,33 +61,3 @@ h4 {
     cursor: pointer;
     background-color: #581f3b;
 }
-
-/* Modals */
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal .modalContent {
-    background-color: white;
-    width: 50%;
-    margin: 100px auto;
-    padding: 50px;
-    line-height: 2em;
-    border-radius: 3px;
-}
-
-.modal.modalInactive {
-    display: none;
-}
-
-.modal.modalActive {
-    display: block;
-}

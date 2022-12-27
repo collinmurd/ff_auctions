@@ -2,7 +2,9 @@
 
 import './Admin.css'
 
-import React from "react";
+import React, {MouseEventHandler} from "react";
+
+import { Modal } from './SharedComponents';
 
 const managers: {[season: string]: string[]} = {
     "2022-2023": [
@@ -24,11 +26,26 @@ const existingAuction = false;
 
 type AdminProps = {};
 type AdminState = {
+    endSeasonModalActive: boolean
 };
 export class Admin extends React.Component<AdminProps, AdminState> {
     constructor(props: any) {
         super(props);
 
+        this.state = {
+            endSeasonModalActive: false
+        }
+
+        this.toggleEndSeasonModal = this.toggleEndSeasonModal.bind(this);
+        this.handleEndSeason = this.handleEndSeason.bind(this);
+    }
+
+    toggleEndSeasonModal() {
+        this.setState({endSeasonModalActive: !this.state.endSeasonModalActive});
+    }
+
+    handleEndSeason() {
+        this.toggleEndSeasonModal();
     }
 
     render() {
@@ -43,13 +60,16 @@ export class Admin extends React.Component<AdminProps, AdminState> {
                 </h4>
                 <div className="buttonContainer">{this.seasonButton()}</div>
                 <div className="buttonContainer">{this.auctionButton()}</div>
+                <Modal active={this.state.endSeasonModalActive} toggle={this.toggleEndSeasonModal} exitButtonText="Confirm">
+                    <p>Are you sure you'd like to end this season?</p>
+                </Modal>
             </div>
         );
     }
 
     seasonButton() {
         if (currentSeason)
-            return <button id="endSeasonButton" className="button">End Current Season</button>
+            return <button id="endSeasonButton" className="button" onClick={this.handleEndSeason}>End Current Season</button>
         else
             return <button id="createSeasonButton" className="button">Create New Season</button>
     }
