@@ -29,24 +29,25 @@ export class Admin extends React.Component<AdminProps, AdminState> {
             <div id="admin">
                 <h2>Administration</h2>
                 <SeasonInfo season={currentSeason} week={currentWeek} />
-                <div className="buttonContainer">{this.seasonSetting()}</div>
-                <div className="buttonContainer">{this.auctionButton()}</div>
+                <div className="settingContainer">{this.settings()}</div>
             </div>
         );
     }
 
-    seasonSetting() {
-        if (currentSeason)
-            return <EndSeasonSetting />
-        else
-            return <EndAuctionSetting />
-    }
+    settings() {
+        let settings: JSX.Element[] = [];
+        if (currentSeason) {
+            settings.push(<EndSeasonSetting />);
+            if (existingAuction) {
+                settings.push(<EndAuctionSetting />);
+            } else {
+                settings.push(<button id="createAuctionButton" className="button">Create New Auction</button>);
+            }
+        } else {
+            settings.push(<CreateSeasonSetting />)
+        }
 
-    auctionButton() {
-        if (existingAuction)
-            return <button id="endAuctionButton" className="button">End Current Auction</button>
-        else
-            return <button id="createAuctionButton" className="button">Create New Auction</button>
+        return settings;
     }
 }
 
@@ -66,6 +67,43 @@ function SeasonInfo(props: {season: string | null, week: number | null}) {
                 <h4>No Current Season</h4>
             </div>
         )
+    }
+}
+
+// ----------------------------------------------
+
+type CreateSeasonSettingState = {
+    modalActive: boolean
+}
+class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> {
+    constructor(props: any) {
+        super(props);
+
+        this.state = {
+            modalActive: false
+        };
+
+        this.toggleModal = this.toggleModal.bind(this);
+        this.handleCreateSeason = this.handleCreateSeason.bind(this);
+    }
+
+    toggleModal() {
+        this.setState({modalActive: !this.state.modalActive});
+    }
+
+    handleCreateSeason() {
+        this.toggleModal();
+    }
+
+    render() {
+        return (
+            <div id="endSeason">
+                <button id="endSeasonButton" className="button" onClick={this.handleCreateSeason}>Start a new Season</button>
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                    <h2>Start a new Season</h2>
+                </Modal>
+            </div>
+        );
     }
 }
 
