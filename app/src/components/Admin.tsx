@@ -39,7 +39,7 @@ export class Admin extends React.Component<AdminProps, AdminState> {
         if (currentSeason)
             return <EndSeasonSetting />
         else
-            return <button id="createSeasonButton" className="button">Create New Season</button>
+            return <EndAuctionSetting />
     }
 
     auctionButton() {
@@ -100,6 +100,43 @@ class EndSeasonSetting extends React.Component<{}, EndSeasonSettingState> {
                 <button id="endSeasonButton" className="button" onClick={this.handleEndSeason}>End Current Season</button>
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
                     <p>Are you sure you'd like to end this season?</p>
+                </Modal>
+            </div>
+        );
+    }
+}
+
+// ----------------------------------------------
+
+type EndAuctionSettingState = {
+    modalActive: boolean
+}
+class EndAuctionSetting extends React.Component<{}, EndAuctionSettingState> {
+    constructor(props: any) {
+        super(props);
+
+        this.state = {
+            modalActive: false
+        }
+
+        this.toggleModal = this.toggleModal.bind(this);
+        this.handleEndAuction = this.handleEndAuction.bind(this);
+    }
+
+    toggleModal() {
+        this.setState({modalActive: !this.state.modalActive});
+    }
+
+    handleEndAuction() {
+        this.toggleModal();
+    }
+
+    render() {
+        return (
+            <div id="endAuction">
+                <button id="endAuctionButton" className="button" onClick={this.handleEndAuction}>End Current Auction</button>
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} exitButtonText="Confirm">
+                    <p>Are you sure you'd like to end the ongoing aution? This prevent further bids and progress the week.</p>
                 </Modal>
             </div>
         );
