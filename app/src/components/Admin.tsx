@@ -53,11 +53,11 @@ export class Admin extends React.Component<AdminProps, AdminState> {
 // ----------------------------------------------
 
 function SeasonInfo(props: {season: string | null, week: number | null}) {
-    if (currentSeason) {
+    if (props.season) {
         return (
             <div id="seasonInfo">
-                <h4>Current Season: {currentSeason}</h4>
-                <h4>Current Week: {currentSeason}</h4>
+                <h4>Current Season: {props.season}</h4>
+                <h4>Current Week: {props.week}</h4>
             </div>
         )
     } else {
