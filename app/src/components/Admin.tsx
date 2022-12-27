@@ -6,8 +6,8 @@ import React from "react";
 
 import { Modal } from './SharedComponents';
 
-const currentSeason = "2022-2023"; // can be null. that would indicate there is no current season
-const currentWeek = 4; // can be null. indicates same as above
+const currentSeason = null; // can be null. that would indicate there is no current season
+const currentWeek = null; // can be null. indicates same as above
 const existingAuction = false;
 
 type AdminProps = {};
@@ -24,15 +24,11 @@ export class Admin extends React.Component<AdminProps, AdminState> {
     }
 
     render() {
+
         return (
             <div id="admin">
                 <h2>Administration</h2>
-                <h4>
-                    {currentSeason ? `Current Season: ${currentSeason}` : 'No Current Season'}
-                </h4>
-                <h4>
-                    {currentWeek ? `Current Week: ${currentWeek}` : 'No Current Season'}
-                </h4>
+                <SeasonInfo season={currentSeason} week={currentWeek} />
                 <div className="buttonContainer">{this.seasonSetting()}</div>
                 <div className="buttonContainer">{this.auctionButton()}</div>
             </div>
@@ -51,6 +47,25 @@ export class Admin extends React.Component<AdminProps, AdminState> {
             return <button id="endAuctionButton" className="button">End Current Auction</button>
         else
             return <button id="createAuctionButton" className="button">Create New Auction</button>
+    }
+}
+
+// ----------------------------------------------
+
+function SeasonInfo(props: {season: string | null, week: number | null}) {
+    if (currentSeason) {
+        return (
+            <div id="seasonInfo">
+                <h4>Current Season: {currentSeason}</h4>
+                <h4>Current Week: {currentSeason}</h4>
+            </div>
+        )
+    } else {
+        return (
+            <div id="seasonInfo">
+                <h4>No Current Season</h4>
+            </div>
+        )
     }
 }
 
