@@ -265,15 +265,36 @@ class EndAuctionSetting extends React.Component<{}, EndAuctionSettingState> {
 
 // ----------------------------------------------
 
-class CreateAuctionSetting extends React.Component {
+type CreateAuctionSettingState = {
+    modalActive: boolean
+};
+class CreateAuctionSetting extends React.Component<{}, CreateAuctionSettingState> {
     constructor(props: any) {
         super(props);
+
+        this.state = {
+            modalActive: false
+        };
+
+        this.toggleModal = this.toggleModal.bind(this);
+        this.handleCreateAuction = this.handleCreateAuction.bind(this);
+    }
+
+    toggleModal() {
+        this.setState({modalActive: !this.state.modalActive});
+    }
+
+    handleCreateAuction() {
+        this.toggleModal();
     }
 
     render() {
         return (
             <div id="createAuctionSetting" className="settingSection">
-                <button key="createAuctionSetting" id="createAuctionButton" className="button">Create New Auction</button>
+                <button id="createAuctionButton" className="button" onClick={this.handleCreateAuction}>Create New Auction</button>
+                <Modal active={this.state.modalActive} toggle={this.toggleModal} >
+                    <p>Please list the players up for auction and their position.</p>
+                </Modal>
             </div>
         );
     }
