@@ -125,7 +125,6 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
     }
 
     handleRemoveManagerClick(event: any, index: number) {
-        console.log(`index: ${index}`)
         this.setState(prevState => {
             // using filter() because splice() changes the underlying array object
             // react in strict mode calls setState twice, so splice() was deleting two inputs
