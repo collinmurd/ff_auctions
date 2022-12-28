@@ -41,7 +41,8 @@ export class Admin extends React.Component<AdminProps, AdminState> {
             if (existingAuction) {
                 settings.push(<EndAuctionSetting key="endAuctionSetting" />);
             } else {
-                settings.push(<button key="createAuctionSetting" id="createAuctionButton" className="button">Create New Auction</button>);
+                // settings.push(<button key="createAuctionSetting" id="createAuctionButton" className="button">Create New Auction</button>);
+                settings.push(<CreateAuctionSetting key="createAuctionSetting" />);
             }
         } else {
             settings.push(<CreateSeasonSetting key="createSeasonSetting" />)
@@ -257,6 +258,22 @@ class EndAuctionSetting extends React.Component<{}, EndAuctionSettingState> {
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <p>Are you sure you'd like to end the ongoing aution? This prevent further bids and progress the week.</p>
                 </Modal>
+            </div>
+        );
+    }
+}
+
+// ----------------------------------------------
+
+class CreateAuctionSetting extends React.Component {
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div id="createAuctionSetting" className="settingSection">
+                <button key="createAuctionSetting" id="createAuctionButton" className="button">Create New Auction</button>
             </div>
         );
     }
