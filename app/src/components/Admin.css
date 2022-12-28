@@ -3,6 +3,10 @@
     margin: 30px 10px;
 }
 
+#admin .settingSection {
+    margin-bottom: 20px;
+}
+
 #endSeason form {
     margin: 30px 20px;
 }

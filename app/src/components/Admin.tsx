@@ -6,8 +6,8 @@ import React from "react";
 
 import { Modal } from './SharedComponents';
 
-const currentSeason = null; // can be null. that would indicate there is no current season
-const currentWeek = null; // can be null. indicates same as above
+const currentSeason = "2022-2023"; // can be null. that would indicate there is no current season
+const currentWeek = 14; // can be null. indicates same as above
 const existingAuction = false;
 
 type AdminProps = {};
@@ -56,7 +56,7 @@ export class Admin extends React.Component<AdminProps, AdminState> {
 function SeasonInfo(props: {season: string | null, week: number | null}) {
     if (props.season) {
         return (
-            <div id="seasonInfo">
+            <div id="seasonInfo" className="settingSection">
                 <h4>Current Season: {props.season}</h4>
                 <h4>Current Week: {props.week}</h4>
             </div>
@@ -140,7 +140,7 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
 
     render() {
         return (
-            <div id="endSeason">
+            <div id="endSeason" className="settingSection">
                 <button id="endSeasonButton" className="button" onClick={this.handleCreateSeason}>Start a new Season</button>
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <h2>Start a new season</h2>
@@ -215,7 +215,7 @@ class EndSeasonSetting extends React.Component<{}, EndSeasonSettingState> {
 
     render() {
         return (
-            <div id="endSeason">
+            <div id="endSeason" className="settingSection">
                 <button id="endSeasonButton" className="button" onClick={this.handleEndSeason}>End Current Season</button>
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <p>Are you sure you'd like to end this season?</p>
