@@ -141,8 +141,8 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
 
     render() {
         return (
-            <div id="endSeason" className="settingSection">
-                <button id="endSeasonButton" className="button" onClick={this.handleCreateSeason}>Start a new Season</button>
+            <div id="createSeason" className="settingSection">
+                <button id="createSeasonButton" className="button" onClick={this.handleCreateSeason}>Start a new Season</button>
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} >
                     <h2>Start a new season</h2>
                     <form>
@@ -158,7 +158,7 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
                             <h5>Input Manager names:</h5>
                             {this.managerInputs()}
                             <div>
-                                <button id="addAnotherManagerButton" className="button" onClick={this.handleAddAnotherManagerClick}>+ Add Another Manager</button>
+                                <button id="addAnotherManagerButton" className="addRowButton button" onClick={this.handleAddAnotherManagerClick}>+ Add Another Manager</button>
                             </div>
                         </div>
                         <div className="submitButtonContainer">
@@ -174,14 +174,14 @@ class CreateSeasonSetting extends React.Component<{}, CreateSeasonSettingState> 
         let inputs: JSX.Element[] = [];
         for (let i = 0; i < this.state.managerInputs.length; i++) {
             inputs.push(
-                <div key={i} className="managerInputRow">
+                <div key={i} className="managerInputRow inputRow">
                     <input
                         type="text"
                         className="managerInputField"
                         value={this.state.managerInputs[i]}
                         onChange={(e) => this.handleManagerInputChange(e, i)}
                         placeholder="Firstname Lastname" />
-                    <button className="removeManagerButton button" onClick={(e) => this.handleRemoveManagerClick(e, i)}>&#10006;</button>
+                    <button className="removeManagerButton removeRowButton button" onClick={(e) => this.handleRemoveManagerClick(e, i)}>&#10006;</button>
                 </div>
             );
         } 
@@ -266,36 +266,111 @@ class EndAuctionSetting extends React.Component<{}, EndAuctionSettingState> {
 // ----------------------------------------------
 
 type CreateAuctionSettingState = {
-    modalActive: boolean
+    modalActive: boolean,
+    playerInputs: {name: string, position: string}[]
 };
 class CreateAuctionSetting extends React.Component<{}, CreateAuctionSettingState> {
     constructor(props: any) {
         super(props);
 
         this.state = {
-            modalActive: false
+            modalActive: false,
+            playerInputs: [{name: '', position: 'QB'}]
         };
 
         this.toggleModal = this.toggleModal.bind(this);
-        this.handleCreateAuction = this.handleCreateAuction.bind(this);
+        this.handleNameInputChange = this.handleNameInputChange.bind(this);
+        this.handlePositionInputChange = this.handlePositionInputChange.bind(this);
+        this.handleAddPlayer = this.handleAddPlayer.bind(this);
+        this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
+        this.handleSubmitNewAuction = this.handleSubmitNewAuction.bind(this);
     }
 
     toggleModal() {
         this.setState({modalActive: !this.state.modalActive});
     }
 
-    handleCreateAuction() {
+    handleNameInputChange(event: React.ChangeEvent<HTMLInputElement>, index: number) {
+        this.setState(prevState => {
+            prevState.playerInputs[index].name = event.target.value;
+            return {playerInputs: prevState.playerInputs};
+        });
+    }
+
+    handlePositionInputChange(event: React.ChangeEvent<HTMLSelectElement>, index: number) {
+        this.setState(prevState => {
+            prevState.playerInputs[index].position = event.target.value;
+            return {playerInputs: prevState.playerInputs};
+        });
+    }
+
+    handleAddPlayer(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        this.setState(prevState => {
+            return {playerInputs: [...prevState.playerInputs, {name: "", position: ""}]};
+        });
+        event.preventDefault();
+    }
+
+    handleRemovePlayer(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, index: number) {
+        this.setState(prevState => {
+            // using filter() because splice() changes the underlying array object
+            // react in strict mode calls setState twice, so splice() was deleting two inputs
+            return {playerInputs: prevState.playerInputs.filter((_, i) => i !== index)};
+        })
+        event.preventDefault();
+    }
+
+    handleSubmitNewAuction(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         this.toggleModal();
+        event.preventDefault();
     }
 
     render() {
         return (
-            <div id="createAuctionSetting" className="settingSection">
-                <button id="createAuctionButton" className="button" onClick={this.handleCreateAuction}>Create New Auction</button>
+            <div id="createAuction" className="settingSection">
+                <button id="createAuctionButton" className="button" onClick={this.toggleModal}>Create New Auction</button>
                 <Modal active={this.state.modalActive} toggle={this.toggleModal} >
-                    <p>Please list the players up for auction and their position.</p>
+                    <form>
+                        <p>Please list the players up for auction and their position.</p>
+                        <div id="playerInputs">
+                            {this.playerInputs()}
+                            <div>
+                                <button id="addAnotherPlayerButton" className="addRowButton button" onClick={this.handleAddPlayer}>+ Add Another Player</button>
+                            </div>
+                        </div>
+                        <div className="submitButtonContainer">
+                            <button className="button" onClick={this.handleSubmitNewAuction}>Start Auction</button>
+                        </div>
+                    </form>
                 </Modal>
             </div>
         );
+    }
+
+    playerInputs() {
+        let inputs: JSX.Element[] = [];
+
+        this.state.playerInputs.forEach((input, i) => {
+            inputs.push(
+                <div key={i} className="playerInput">
+                    <input
+                        value={input.name}
+                        type="text"
+                        placeholder="Player Name"
+                        onChange={(e) => this.handleNameInputChange(e, i)} />
+                    <select value={input.position} onChange={(e) => this.handlePositionInputChange(e, i)}>
+                        <option value="QB">QB</option>
+                        <option value="RB">RB</option>
+                        <option value="WR">WR</option>
+                        <option value="TE">TE</option>
+                        <option value="K">K</option>
+                        <option value="DEF">DEF</option>
+                    </select>
+                    <button className="removePlayerInput removeRowButton button" onClick={(e) => {this.handleRemovePlayer(e, i)}}>&#10006;</button>
+                </div>
+            );
+        });
+
+        return inputs;
     }
 }

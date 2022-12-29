@@ -7,34 +7,45 @@
     margin-bottom: 20px;
 }
 
-#endSeason form {
+#createSeason form {
     margin: 30px 20px;
 }
 
-#endSeason #managerInput {
+#createSeason #managerInput {
     margin: 20px 0;
 }
 
-#endSeason #managerInput .managerInputField {
+#createSeason #managerInput .managerInputField {
     height: 20px;
     vertical-align: middle;
 }
 
-#endSeason #managerInput .removeManagerButton {
+#admin .removeRowButton {
     vertical-align: middle;
     margin-left: 10px;
     min-width: 0;
     height: auto;
 }
 
-#endSeason #managerInput #addAnotherManagerButton {
+#admin .addRowButton {
     margin-top: 10px;
 }
 
-#endSeason .submitButtonContainer {
+#admin .submitButtonContainer {
     overflow: hidden;
 }
 
-#endSeason .submitButtonContainer button {
+#admin .submitButtonContainer button {
     float: right;
+}
+
+#createAuction input {
+    height: 20px;
+    vertical-align: middle;
+}
+
+#createAuction select {
+    height: 25px;
+    margin-left: 10px;
+    vertical-align: middle;
 }
