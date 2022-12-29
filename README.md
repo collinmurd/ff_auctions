@@ -5,11 +5,11 @@ Making this because we have nothing better than Google Forms and Sheets for auct
 ### What can I do with it?
 - League admin can input players to be auctioned each week.
 - Managers can bid on players each week.
-- Anyone can look at auction history.
+- Anyone can look at auction history from current and past seasons.
   - View by Manager
   - View by Player
 
 ### What's it made of?
-- Frontend in React (because I want to learn it).
-- Backend in Rust (because it's cool).
-- Postgres database (until I find something more interesting).
+- Frontend in React
+- Backend in Rust
+- a database
