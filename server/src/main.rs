@@ -1,15 +1,38 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{web, App, HttpServer, Responder, HttpResponse};
+use serde::Serialize;
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
+#[derive(Serialize)]
+struct Player<'a> {
+    name: &'a str,
+    position: &'a str 
+}
+
+#[derive(Serialize)]
+struct AuctionResponse<'a> {
+    players: Vec<Player<'a>>
+}
+
+async fn get_current_auction() -> impl Responder {
+    let player = Player {
+        name: "Justin Jefferson",
+        position: "WR"
+    };
+    let resp = AuctionResponse {
+        players: vec![
+            player
+        ]
+    };
+    return HttpResponse::Ok().json(web::Json(resp))
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .service(hello)
+            .service(
+                web::scope("/auction")
+                    .route("", web::get().to(get_current_auction))
+            )
     })
     .bind(("127.0.0.1", 8080))?
     .run()
