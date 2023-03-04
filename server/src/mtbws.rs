@@ -4,14 +4,14 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 
-type Handler =  &'static dyn Fn(Request) -> Response;
-pub struct Server {
-    endpoints: Vec<Endpoint>
+type Handler<'a> = &'a dyn Fn(Request) -> Response;
+pub struct Server<'a> {
+    endpoints: Vec<Endpoint<'a>>
 }
 
-impl Server {
+impl<'a> Server<'a> {
 
-    pub fn new() -> Server {
+    pub fn new() -> Server<'a> {
         return Server {
             endpoints: Vec::new()
         }
@@ -27,7 +27,8 @@ impl Server {
         }
     }
 
-    pub fn add_endpoint<F>(&mut self, pattern: String, handler: Handler) {
+    pub fn register_endpoint(&mut self, pattern: String, handler: Handler<'a>) {
+        self.endpoints.retain(|endpoint| endpoint.pattern != pattern);
         self.endpoints.push(Endpoint { pattern: pattern, handler: handler });
     }
 
@@ -43,9 +44,15 @@ impl Server {
 }
 
 
-struct Endpoint {
+struct Endpoint<'a> {
     pattern: String,
-    handler: Handler
+    handler: Handler<'a>
+}
+
+impl<'a> Endpoint<'a> {
+    fn handle(&self, req: Request) -> Response {
+        (self.handler)(req)
+    }
 }
 
 pub struct Header {
@@ -63,4 +70,45 @@ pub struct Response {
     status_code: u8,
     headers: Vec<Header>,
     content: String
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn register_handler() {
+        let mut server = Server::new();
+
+        let my_good_handler_closure = |req: Request| -> Response {
+            Response {
+                status_code: 200,
+                headers: vec![Header{ key: String::from("key"), value: String::from("value ") }],
+                content: String::from("content")
+            }
+        };
+
+        fn my_good_handler_fn(req: Request) -> Response {
+            Response {
+                status_code: 201,
+                headers: vec![Header{ key: String::from("key"), value: String::from("value ") }],
+                content: String::from("content")
+            }
+        }
+
+        server.register_endpoint(String::from("/"), &my_good_handler_closure);
+        assert_eq!(server.endpoints.len(), 1);
+
+        server.register_endpoint(String::from("/"), &my_good_handler_fn);
+        assert_eq!(server.endpoints.len(), 1);
+
+        let req = Request {
+            path: String::from("/"),
+            headers: Vec::new(),
+            data: String::from("asdf")
+        };
+        assert_eq!(server.endpoints.get(0).unwrap().handle(req).status_code, 201);
+
+        server.register_endpoint(String::from("/asdf"), &my_good_handler_fn);
+        assert_eq!(server.endpoints.len(), 2);
+    }
 }
