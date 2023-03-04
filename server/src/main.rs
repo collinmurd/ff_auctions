@@ -2,8 +2,7 @@
 mod mtbws;
 
 fn main() {
-    let server = mtbws::Server {};
-
+    let server = mtbws::Server::new();
     server.listen()
 }
 
