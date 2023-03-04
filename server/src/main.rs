@@ -1,4 +1,9 @@
+
+mod mtbws;
+
 fn main() {
-    println!("Hello, world!");
+    let server = mtbws::Server {};
+
+    server.listen()
 }
 
