@@ -5,6 +5,17 @@ use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 
 type Handler<'a> = &'a dyn Fn(Request) -> Response;
+#[derive(PartialEq)]
+pub enum HTTPMethod {
+    GET,
+    HEAD,
+    POST,
+    PUT,
+    DELETE,
+    CONNECT,
+    OPTIONS,
+    TRACE
+}
 pub struct Server<'a> {
     endpoints: Vec<Endpoint<'a>>
 }
@@ -27,9 +38,11 @@ impl<'a> Server<'a> {
         }
     }
 
-    pub fn register_endpoint(&mut self, pattern: String, handler: Handler<'a>) {
-        self.endpoints.retain(|endpoint| endpoint.pattern != pattern);
-        self.endpoints.push(Endpoint { pattern: pattern, handler: handler });
+    pub fn register_endpoint(&mut self, method: HTTPMethod, pattern: String, handler: Handler<'a>) {
+        self.endpoints.retain(|endpoint| {
+            endpoint.pattern != pattern || endpoint.method != method
+        });
+        self.endpoints.push(Endpoint { method: method, pattern: pattern, handler: handler });
     }
 
     fn handle_connection(&self, mut stream: TcpStream){
@@ -45,6 +58,7 @@ impl<'a> Server<'a> {
 
 
 struct Endpoint<'a> {
+    method: HTTPMethod,
     pattern: String,
     handler: Handler<'a>
 }
@@ -79,7 +93,7 @@ mod tests {
     fn register_handler() {
         let mut server = Server::new();
 
-        let my_good_handler_closure = |req: Request| -> Response {
+        let my_good_handler_closure = |_req: Request| -> Response {
             Response {
                 status_code: 200,
                 headers: vec![Header{ key: String::from("key"), value: String::from("value ") }],
@@ -87,7 +101,7 @@ mod tests {
             }
         };
 
-        fn my_good_handler_fn(req: Request) -> Response {
+        fn my_good_handler_fn(_req: Request) -> Response {
             Response {
                 status_code: 201,
                 headers: vec![Header{ key: String::from("key"), value: String::from("value ") }],
@@ -95,10 +109,10 @@ mod tests {
             }
         }
 
-        server.register_endpoint(String::from("/"), &my_good_handler_closure);
+        server.register_endpoint(HTTPMethod::GET, String::from("/"), &my_good_handler_closure);
         assert_eq!(server.endpoints.len(), 1);
 
-        server.register_endpoint(String::from("/"), &my_good_handler_fn);
+        server.register_endpoint(HTTPMethod::GET, String::from("/"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 1);
 
         let req = Request {
@@ -108,7 +122,10 @@ mod tests {
         };
         assert_eq!(server.endpoints.get(0).unwrap().handle(req).status_code, 201);
 
-        server.register_endpoint(String::from("/asdf"), &my_good_handler_fn);
+        server.register_endpoint(HTTPMethod::GET, String::from("/asdf"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 2);
+
+        server.register_endpoint(HTTPMethod::POST, String::from("/asdf"), &my_good_handler_fn);
+        assert_eq!(server.endpoints.len(), 3);
     }
 }
