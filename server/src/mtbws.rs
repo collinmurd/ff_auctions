@@ -4,6 +4,7 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 
+type Handler =  &'static dyn Fn(Request) -> Response;
 pub struct Server {
     endpoints: Vec<Endpoint>
 }
@@ -26,7 +27,7 @@ impl Server {
         }
     }
 
-    pub fn add_endpoint<F>(&mut self, pattern: String, handler: &'static dyn Fn(Request) -> Response) {
+    pub fn add_endpoint<F>(&mut self, pattern: String, handler: Handler) {
         self.endpoints.push(Endpoint { pattern: pattern, handler: handler });
     }
 
@@ -44,7 +45,7 @@ impl Server {
 
 struct Endpoint {
     pattern: String,
-    handler: &'static dyn Fn(Request) -> Response
+    handler: Handler
 }
 
 pub struct Header {
