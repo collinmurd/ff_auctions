@@ -3,9 +3,11 @@
 
 use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
+use strum_macros::EnumString;
+use std::str::FromStr;
 
 type Handler<'a> = &'a dyn Fn(Request) -> Response;
-#[derive(PartialEq)]
+#[derive(PartialEq, EnumString)]
 pub enum HTTPMethod {
     GET,
     HEAD,
@@ -70,14 +72,43 @@ impl<'a> Endpoint<'a> {
 }
 
 pub struct Header {
-    key: String,
+    name: String,
     value: String
 }
 
 pub struct Request {
+    method: HTTPMethod,
     path: String,
     headers: Vec<Header>,
-    data: String
+    content: String
+}
+
+impl Request {
+    /// Creates a [Request] object from a [std::Vec](Vec<String>) 
+    /// representing the lines of an HTTP request.
+    fn from_lines(lines: Vec<String>) -> Result<Request, &'static str> {
+        let control: Vec<&str> = lines.get(0).unwrap().split(' ').collect();
+        if control.len() != 3 {
+            return Result::Err("Misconfigured control line");
+        }
+
+        if control[2] != String::from("HTTP/1.1") {
+            return Result::Err("HTTP version not accepted");
+        }
+
+        let method = match HTTPMethod::from_str(control[0]) {
+            Ok(m) => m,
+            Err(_) => return Result::Err("Invalid method")
+        };
+        let path = control[1];
+
+        return Result::Ok(Request {
+            method: method,
+            path: String::from(path),
+            headers: vec![Header { name: String::from("TODO"), value: String::from("fix this") }],
+            content: String::from("fix me")
+        });
+    }
 }
 
 pub struct Response {
@@ -96,7 +127,7 @@ mod tests {
         let my_good_handler_closure = |_req: Request| -> Response {
             Response {
                 status_code: 200,
-                headers: vec![Header{ key: String::from("key"), value: String::from("value ") }],
+                headers: vec![Header{ name: String::from("key"), value: String::from("value ") }],
                 content: String::from("content")
             }
         };
@@ -104,7 +135,7 @@ mod tests {
         fn my_good_handler_fn(_req: Request) -> Response {
             Response {
                 status_code: 201,
-                headers: vec![Header{ key: String::from("key"), value: String::from("value ") }],
+                headers: vec![Header{ name: String::from("key"), value: String::from("value ") }],
                 content: String::from("content")
             }
         }
@@ -116,9 +147,10 @@ mod tests {
         assert_eq!(server.endpoints.len(), 1);
 
         let req = Request {
+            method: HTTPMethod::GET,
             path: String::from("/"),
             headers: Vec::new(),
-            data: String::from("asdf")
+            content: String::from("asdf")
         };
         assert_eq!(server.endpoints.get(0).unwrap().handle(req).status_code, 201);
 
@@ -127,5 +159,24 @@ mod tests {
 
         server.register_endpoint(HTTPMethod::POST, String::from("/asdf"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 3);
+    }
+
+
+    #[test]
+    fn request_from_lines() {
+        let good_lines = vec![
+            String::from("GET / HTTP/1.1"),
+            String::from("My-Header: something"),
+            String::from(""),
+            String::from("asdf"),
+            String::from("asdf line two")
+        ];
+
+        let req = Request::from_lines(good_lines).unwrap();
+        assert_eq!(req.path, String::from("/"));
+        assert_eq!(req.headers.len(), 1);
+        assert_eq!(req.headers.get(0).unwrap().name, String::from("My-Header"));
+        assert_eq!(req.headers.get(0).unwrap().value, String::from("something"));
+        assert_eq!(req.content, String::from("asdf\nasdf line two"));
     }
 }
