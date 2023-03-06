@@ -56,6 +56,26 @@ impl<'a> Server<'a> {
 
         println!("Request: {:#?}", http_request);
     }
+
+    /// Parses the Control line of the HTTP request
+    /// Example control line:
+    /// `POST /endpoint HTTP/1.1`
+    fn parse_control(&self, control_line: String) -> Control {
+        unimplemented!()
+    }
+
+    fn parse_headers(lines: Vec<String>) -> Result<Vec<Header>, String> {
+        let mut result: Vec<Header> = Vec::new();
+        for line in lines {
+            let (name, value) = match line.split_once(": ") {
+                Some(t) => t,
+                None => return Result::Err(format!("Invalid Header line: {}", line))
+            };
+            result.push(Header{name: String::from(name), value: String::from(value)});
+        }
+
+        Result::Ok(result)
+    }
 }
 
 
@@ -76,9 +96,14 @@ pub struct Header {
     value: String
 }
 
-pub struct Request {
+pub struct Control {
     method: HTTPMethod,
     path: String,
+    version: String
+}
+
+pub struct Request {
+    control: Control,
     headers: Vec<Header>,
     content: String
 }
@@ -103,8 +128,7 @@ impl Request {
         let path = control[1];
 
         return Result::Ok(Request {
-            method: method,
-            path: String::from(path),
+            control: Control { method: method, path: String::from(path), version: String::from("HTTP/1.1") },
             headers: vec![Header { name: String::from("TODO"), value: String::from("fix this") }],
             content: String::from("fix me")
         });
@@ -147,8 +171,7 @@ mod tests {
         assert_eq!(server.endpoints.len(), 1);
 
         let req = Request {
-            method: HTTPMethod::GET,
-            path: String::from("/"),
+            control: Control { method: HTTPMethod::GET, path: String::from("/"), version: String::from("HTTP/1.1") },
             headers: Vec::new(),
             content: String::from("asdf")
         };
@@ -173,10 +196,31 @@ mod tests {
         ];
 
         let req = Request::from_lines(good_lines).unwrap();
-        assert_eq!(req.path, String::from("/"));
+        assert_eq!(req.control.path, String::from("/"));
         assert_eq!(req.headers.len(), 1);
         assert_eq!(req.headers.get(0).unwrap().name, String::from("My-Header"));
         assert_eq!(req.headers.get(0).unwrap().value, String::from("something"));
         assert_eq!(req.content, String::from("asdf\nasdf line two"));
+    }
+
+
+    #[test]
+    fn parse_control() {
+
+    }
+
+    #[test]
+    fn parse_headers() {
+        let good = vec![
+            String::from("Content-Type: something"),
+            String::from("asdf: test")
+        ];
+        let headers = Server::parse_headers(good).unwrap();
+        assert_eq!(headers.len(), 2);
+        assert_eq!(headers[0].name, String::from("Content-Type"));
+        assert_eq!(headers[1].value, String::from("test"));
+
+        let bad = vec![String::from("ahhhhhhhhhhh!")];
+        assert!(Server::parse_headers(bad).is_err());
     }
 }
