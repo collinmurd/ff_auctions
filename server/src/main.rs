@@ -2,7 +2,7 @@
 use server::mtbws;
 
 fn main() {
-    let server = mtbws::Server::new();
+    let server = mtbws::server::Server::new();
     server.listen()
 }
 
