@@ -7,7 +7,7 @@ use strum_macros::EnumString;
 use std::str::FromStr;
 
 type Handler<'a> = &'a dyn Fn(Request) -> Response;
-#[derive(PartialEq, EnumString)]
+#[derive(Debug, PartialEq, EnumString)]
 pub enum HTTPMethod {
     GET,
     HEAD,
@@ -57,13 +57,12 @@ impl<'a> Server<'a> {
         println!("Request: {:#?}", http_request);
     }
 
-    /// Parses the Control line of the HTTP request
-    /// Example control line:
-    /// `POST /endpoint HTTP/1.1`
-    fn parse_control(&self, control_line: String) -> Control {
-        unimplemented!()
-    }
-
+    /// Parses headers from an HTTP request given a [Vec<String>]
+    /// Example `lines`:
+    /// ```
+    /// Content-Type: json
+    /// My-Header: value
+    /// ```
     fn parse_headers(lines: Vec<String>) -> Result<Vec<Header>, String> {
         let mut result: Vec<Header> = Vec::new();
         for line in lines {
@@ -96,42 +95,44 @@ pub struct Header {
     value: String
 }
 
-pub struct Control {
+pub struct Control<'a> {
     method: HTTPMethod,
-    path: String,
-    version: String
+    uri: &'a str,
+    version: &'a str 
 }
 
-pub struct Request {
-    control: Control,
-    headers: Vec<Header>,
-    content: String
-}
-
-impl Request {
-    /// Creates a [Request] object from a [std::Vec](Vec<String>) 
-    /// representing the lines of an HTTP request.
-    fn from_lines(lines: Vec<String>) -> Result<Request, &'static str> {
-        let control: Vec<&str> = lines.get(0).unwrap().split(' ').collect();
+impl<'r> Control<'r> {
+    fn from(control_line: &'r String) -> Result<Control<'r>, &'static str> {
+        let control: Vec<&str> = control_line.split(' ').collect();
         if control.len() != 3 {
             return Result::Err("Misconfigured control line");
         }
 
-        if control[2] != String::from("HTTP/1.1") {
-            return Result::Err("HTTP version not accepted");
-        }
-
         let method = match HTTPMethod::from_str(control[0]) {
             Ok(m) => m,
-            Err(_) => return Result::Err("Invalid method")
+            Err(_) => return Result::Err("Invalid Method")
         };
-        let path = control[1];
 
-        return Result::Ok(Request {
-            control: Control { method: method, path: String::from(path), version: String::from("HTTP/1.1") },
-            headers: vec![Header { name: String::from("TODO"), value: String::from("fix this") }],
-            content: String::from("fix me")
-        });
+        let version = control[2];
+        if version != "HTTP/1.1" {
+            return Result::Err("Invalid Version");
+        }
+
+        Result::Ok(Control { method: method, uri: control[1], version: version })
+    }
+}
+
+pub struct Request<'r> {
+    control: Control<'r>,
+    headers: Vec<Header>,
+    content: String
+}
+
+impl<'r> Request<'r> {
+    /// Creates a [Request] object from a [std::Vec](Vec<String>) 
+    /// representing the lines of an HTTP request.
+    fn from_lines(lines: Vec<String>) -> Result<Request<'r>, &'static str> {
+        unimplemented!();
     }
 }
 
@@ -171,7 +172,7 @@ mod tests {
         assert_eq!(server.endpoints.len(), 1);
 
         let req = Request {
-            control: Control { method: HTTPMethod::GET, path: String::from("/"), version: String::from("HTTP/1.1") },
+            control: Control { method: HTTPMethod::GET, uri: "/", version: "HTTP/1.1" },
             headers: Vec::new(),
             content: String::from("asdf")
         };
@@ -196,7 +197,7 @@ mod tests {
         ];
 
         let req = Request::from_lines(good_lines).unwrap();
-        assert_eq!(req.control.path, String::from("/"));
+        assert_eq!(req.control.uri, String::from("/"));
         assert_eq!(req.headers.len(), 1);
         assert_eq!(req.headers.get(0).unwrap().name, String::from("My-Header"));
         assert_eq!(req.headers.get(0).unwrap().value, String::from("something"));
@@ -206,7 +207,17 @@ mod tests {
 
     #[test]
     fn parse_control() {
+        let good_line = String::from("POST /asdf/fda?a=b HTTP/1.1");
+        let bad_method = String::from("BLAH /asdf/fda?a=b HTTP/1.1");
+        let missing_version = String::from("GET /asdf/fda?a=b ");
 
+        let good_control = Control::from(&good_line).unwrap();
+        assert_eq!(good_control.method, HTTPMethod::POST);
+        assert_eq!(good_control.uri, String::from("/asdf/fda?a=b"));
+        assert_eq!(good_control.version, String::from("HTTP/1.1"));
+
+        assert!(Control::from(&bad_method).is_err());
+        assert!(Control::from(&missing_version).is_err());
     }
 
     #[test]
