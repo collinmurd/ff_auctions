@@ -1,5 +1,5 @@
 
-mod mtbws;
+use server::mtbws;
 
 fn main() {
     let server = mtbws::Server::new();
