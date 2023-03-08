@@ -120,4 +120,19 @@ mod tests {
         server.register_endpoint(HTTPMethod::POST, String::from("/asdf"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 3);
     }
+
+    #[test]
+    fn parse_headers() {
+        let good = vec![
+            String::from("Content-Type: something"),
+            String::from("asdf: test")
+        ];
+        let headers = Server::parse_headers(good).unwrap();
+        assert_eq!(headers.len(), 2);
+        assert_eq!(headers[0].name, String::from("Content-Type"));
+        assert_eq!(headers[1].value, String::from("test"));
+
+        let bad = vec![String::from("ahhhhhhhhhhh!")];
+        assert!(Server::parse_headers(bad).is_err());
+    }
 }
