@@ -24,24 +24,32 @@ pub struct Control<'a> {
 }
 
 impl<'r> Control<'r> {
-    pub fn from(control_line: &'r String) -> Result<Control<'r>, &'static str> {
+    pub fn from(control_line: &'r String) -> Result<Control<'r>, CreateRequestError> {
         let control: Vec<&str> = control_line.split(' ').collect();
         if control.len() != 3 {
-            return Result::Err("Misconfigured control line");
+            return Result::Err(CreateRequestError::InvalidControlLine);
         }
 
         let method = match HTTPMethod::from_str(control[0]) {
             Ok(m) => m,
-            Err(_) => return Result::Err("Invalid Method")
+            Err(_) => return Result::Err(CreateRequestError::InvalidMethod)
         };
 
         let version = control[2];
         if version != "HTTP/1.1" {
-            return Result::Err("Invalid Version");
+            return Result::Err(CreateRequestError::InvalidHTTPVersion);
         }
 
         Result::Ok(Control { method: method, uri: control[1], version: version })
     }
+}
+
+
+#[derive(Debug)]
+pub enum CreateRequestError {
+    InvalidHTTPVersion,
+    InvalidMethod,
+    InvalidControlLine
 }
 
 #[cfg(test)]
