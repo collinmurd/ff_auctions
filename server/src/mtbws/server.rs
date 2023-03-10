@@ -1,4 +1,3 @@
-
 use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 
@@ -42,25 +41,6 @@ impl<'a> Server<'a> {
             .collect();
 
         println!("Request: {:#?}", http_request);
-    }
-
-    /// Parses headers from an HTTP request given a [Vec<String>]
-    /// Example `lines`:
-    /// ```
-    /// Content-Type: json
-    /// My-Header: value
-    /// ```
-    fn parse_headers(lines: Vec<String>) -> Result<Vec<Header>, String> {
-        let mut result: Vec<Header> = Vec::new();
-        for line in lines {
-            let (name, value) = match line.split_once(": ") {
-                Some(t) => t,
-                None => return Result::Err(format!("Invalid Header line: {}", line))
-            };
-            result.push(Header{name: String::from(name), value: String::from(value)});
-        }
-
-        Result::Ok(result)
     }
 }
 
@@ -119,20 +99,5 @@ mod tests {
 
         server.register_endpoint(HTTPMethod::POST, String::from("/asdf"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 3);
-    }
-
-    #[test]
-    fn parse_headers() {
-        let good = vec![
-            String::from("Content-Type: something"),
-            String::from("asdf: test")
-        ];
-        let headers = Server::parse_headers(good).unwrap();
-        assert_eq!(headers.len(), 2);
-        assert_eq!(headers[0].name, String::from("Content-Type"));
-        assert_eq!(headers[1].value, String::from("test"));
-
-        let bad = vec![String::from("ahhhhhhhhhhh!")];
-        assert!(Server::parse_headers(bad).is_err());
     }
 }
