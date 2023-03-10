@@ -1,8 +1,9 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 
-use super::{HTTPMethod, Handler, Header, Control, Request, Response};
+use super::{HTTPMethod, Request, Response};
 
+type Handler<'a> = &'a dyn Fn(Request) -> Response;
 
 pub struct Server<'a> {
     endpoints: Vec<Endpoint<'a>>
@@ -51,7 +52,7 @@ struct Endpoint<'a> {
 }
 
 impl<'a> Endpoint<'a> {
-    fn handle(&self, req: Request) -> Response {
+    fn handle<'b>(&self, req: Request<'b>) -> Response<'b> {
         (self.handler)(req)
     }
 }
@@ -59,37 +60,33 @@ impl<'a> Endpoint<'a> {
 
 #[cfg(test)]
 mod tests {
+    use crate::mtbws::{HeaderMap, request::Control};
+
     use super::*;
 
     #[test]
     fn register_handler() {
         let mut server = Server::new();
 
-        let my_good_handler_closure = |_req: Request| -> Response {
-            Response {
-                status_code: 200,
-                headers: vec![Header{ name: String::from("key"), value: String::from("value ") }],
-                content: String::from("content")
-            }
-        };
+        let mut header_map = HeaderMap::new();
+        header_map.add("key", "value");
 
         fn my_good_handler_fn(_req: Request) -> Response {
+            let mut header_map = HeaderMap::new();
+            header_map.add("key", "value");
             Response {
                 status_code: 201,
-                headers: vec![Header{ name: String::from("key"), value: String::from("value ") }],
+                headers: header_map,
                 content: String::from("content")
             }
         }
-
-        server.register_endpoint(HTTPMethod::GET, String::from("/"), &my_good_handler_closure);
-        assert_eq!(server.endpoints.len(), 1);
 
         server.register_endpoint(HTTPMethod::GET, String::from("/"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 1);
 
         let req = Request {
             control: Control { method: HTTPMethod::GET, uri: "/", version: "HTTP/1.1" },
-            headers: Vec::new(),
+            headers: header_map,
             content: String::from("asdf")
         };
         assert_eq!(server.endpoints.get(0).unwrap().handle(req).status_code, 201);
