@@ -54,7 +54,7 @@ impl<'r> HeaderMap<'r> {
         self.headers.insert(name, value);
     }
 
-    pub fn add_from_line(&mut self, line: &'r String) -> Result<(), &'static str> {
+    pub fn add_from_line(&mut self, line: &'r str) -> Result<(), &'static str> {
         match line.split_once(": ") {
             Some((name, value)) => {
                 self.headers.insert(name, value);

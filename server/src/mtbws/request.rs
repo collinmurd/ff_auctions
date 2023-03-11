@@ -12,8 +12,20 @@ pub struct Request<'r> {
 impl<'r> Request<'r> {
     /// Creates a [Request] object from a [std::Vec](Vec<String>) 
     /// representing the lines of an HTTP request.
-    pub fn from_lines(lines: Vec<String>) -> Result<Request<'r>, CreateRequestError> {
-        unimplemented!();
+    pub fn from_lines(lines: Vec<&'r str>) -> Result<Request<'r>, CreateRequestError> {
+        let control = Control::from(lines[0])?;
+        let mut headers = HeaderMap::new();
+        for line in lines.iter().skip(1) {
+            let clean_line = line.trim();
+            if clean_line != "" {
+                match headers.add_from_line(clean_line) {
+                    Ok(_) => (),
+                    Err(_) => return Result::Err(CreateRequestError::InvalidHeader)
+                };
+            }
+        }
+
+        Result::Ok(Request { control: control, headers: headers, content: String::new() })
     }
 }
 
@@ -24,7 +36,7 @@ pub struct Control<'a> {
 }
 
 impl<'r> Control<'r> {
-    pub fn from(control_line: &'r String) -> Result<Control<'r>, CreateRequestError> {
+    pub fn from(control_line: &'r str) -> Result<Control<'r>, CreateRequestError> {
         let control: Vec<&str> = control_line.split(' ').collect();
         if control.len() != 3 {
             return Result::Err(CreateRequestError::InvalidControlLine);
@@ -49,7 +61,8 @@ impl<'r> Control<'r> {
 pub enum CreateRequestError {
     InvalidHTTPVersion,
     InvalidMethod,
-    InvalidControlLine
+    InvalidControlLine,
+    InvalidHeader
 }
 
 #[cfg(test)]
@@ -58,19 +71,17 @@ mod tests {
 
     #[test]
     fn request_from_lines() {
-        let good_lines = vec![
-            String::from("GET / HTTP/1.1"),
-            String::from("My-Header: something"),
-            String::from(""),
-            String::from("asdf"),
-            String::from("asdf line two")
-        ];
+        let good_lines = vec!["GET / HTTP/1.1", "My-Header: something"];
+        let bad_control = vec!["POST HTTP/1.1", "My-Header: something"];
+        let bad_header = vec!["GET / HTTP/1.1", "ahhhhh!"];
 
         let req = Request::from_lines(good_lines).unwrap();
         assert_eq!(req.control.uri, String::from("/"));
-        assert!(req.headers.get("Content-Value").is_some());
-        assert_eq!(req.headers.get("Content-Value").unwrap(), "something");
-        assert_eq!(req.content, String::from("asdf\nasdf line two"));
+        assert!(req.headers.get("My-Header").is_some());
+        assert_eq!(req.headers.get("My-Header").unwrap(), "something");
+
+        assert!(Request::from_lines(bad_control).is_err());
+        assert!(Request::from_lines(bad_header).is_err());
     }
 
     #[test]
