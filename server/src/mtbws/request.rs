@@ -68,9 +68,8 @@ mod tests {
 
         let req = Request::from_lines(good_lines).unwrap();
         assert_eq!(req.control.uri, String::from("/"));
-        // assert_eq!(req.headers.len(), 1);
-        // assert_eq!(req.headers.get(0).unwrap().name, String::from("My-Header"));
-        // assert_eq!(req.headers.get(0).unwrap().value, String::from("something"));
+        assert!(req.headers.get("Content-Value").is_some());
+        assert_eq!(req.headers.get("Content-Value").unwrap(), "something");
         assert_eq!(req.content, String::from("asdf\nasdf line two"));
     }
 
