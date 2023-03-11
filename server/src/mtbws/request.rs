@@ -1,5 +1,5 @@
 
-use std::str::FromStr;
+use std::{str::FromStr, net::TcpStream};
 
 use super::{HTTPMethod,  HeaderMap};
 
@@ -26,6 +26,10 @@ impl<'r> Request<'r> {
         }
 
         Result::Ok(Request { control: control, headers: headers, content: String::new() })
+    }
+
+    pub fn append_content(&mut self, new_content: &'r str) {
+        self.content.push_str(new_content);
     }
 }
 
@@ -97,5 +101,14 @@ mod tests {
 
         assert!(Control::from(&bad_method).is_err());
         assert!(Control::from(&missing_version).is_err());
+    }
+
+    #[test]
+    fn append_content() {
+        let good_lines = vec!["GET / HTTP/1.1", "My-Header: something"];
+        let mut req = Request::from_lines(good_lines).unwrap();
+        req.append_content("new_content");
+
+        assert_eq!(req.content, "new_content");
     }
 }
