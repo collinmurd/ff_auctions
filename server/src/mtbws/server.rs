@@ -37,16 +37,24 @@ impl<'a> Server<'a> {
 
     fn handle_connection(&self, mut stream: TcpStream){
         let request = self.create_request(stream).unwrap();
+
+        println!("{}", request.control.uri);
     }
 
     fn create_request(&self, mut stream: TcpStream) -> Result<Request, CreateRequestError> {
         let buf_reader = BufReader::new(&mut stream);
         let lines: Vec<_> = buf_reader.lines()
-            .map(|result| result.unwrap())
+            .map(|result| result.unwrap()) // TODO: handle this
             .take_while(|line| !line.is_empty())
             .collect();
 
         let mut request = Request::from_lines(lines)?;
+
+        if let Some(length) = request.headers.get("Content-Length".to_string()) {
+            let mut buf_reader = BufReader::new(&mut stream);
+            let mut buf = vec![0u8; length.parse::<usize>().unwrap()];
+            buf_reader.read_exact(&mut buf).unwrap(); // TODO: handle this
+        }
 
         Result::Ok(request)
     }
@@ -94,7 +102,7 @@ mod tests {
         let req = Request {
             control: Control { method: HTTPMethod::GET, uri: String::from("/"), version: String::from("HTTP/1.1") },
             headers: header_map,
-            content: String::from("asdf")
+            content: "asdf".as_bytes().to_vec()
         };
         assert_eq!(server.endpoints.get(0).unwrap().handle(req).status_code, 201);
 

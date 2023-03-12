@@ -1,12 +1,12 @@
 
-use std::{str::FromStr};
+use std::{str::FromStr, str::from_utf8};
 
 use super::{HTTPMethod,  HeaderMap};
 
 pub struct Request {
     pub control: Control,
     pub headers: HeaderMap,
-    pub content: String
+    pub content: Vec<u8>
 }
 
 impl Request {
@@ -28,11 +28,11 @@ impl Request {
             }
         }
 
-        Result::Ok(Request { control: control, headers: headers, content: String::new() })
+        Result::Ok(Request { control: control, headers: headers, content: Vec::new() })
     }
 
-    pub fn append_content(&mut self, new_content: &str) {
-        self.content.push_str(new_content);
+    pub fn append_content(&mut self, mut new_content: Vec<u8>) {
+        self.content.append(&mut new_content);
     }
 }
 
@@ -111,8 +111,8 @@ mod tests {
     fn append_content() {
         let good_lines = vec![String::from("GET / HTTP/1.1"), String::from("My-Header: something")];
         let mut req = Request::from_lines(good_lines).unwrap();
-        req.append_content("new_content");
+        req.append_content("new_content".as_bytes().to_vec());
 
-        assert_eq!(req.content, "new_content");
+        assert_eq!(from_utf8(&req.content).unwrap(), "new_content");
     }
 }
