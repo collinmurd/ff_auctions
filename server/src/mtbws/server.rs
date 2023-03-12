@@ -38,24 +38,34 @@ impl<'a> Server<'a> {
     fn handle_connection(&self, mut stream: TcpStream){
         let request = self.create_request(stream).unwrap();
 
-        println!("{}", request.control.uri);
+        println!("{:#?}", request);
     }
 
     fn create_request(&self, mut stream: TcpStream) -> Result<Request, CreateRequestError> {
-        let buf_reader = BufReader::new(&mut stream);
-        let lines: Vec<_> = buf_reader.lines()
-            .map(|result| result.unwrap()) // TODO: handle this
-            .take_while(|line| !line.is_empty())
-            .collect();
+        let mut buf_reader = BufReader::new(&mut stream);
+        let mut lines: Vec<String> = Vec::new();
+        loop {
+            let mut head_buf = String::new();
+            let l = match buf_reader.read_line(&mut head_buf) {
+                Ok(l) => l,
+                Err(_) => return Err(CreateRequestError::ParseError)
+            };
+            if l < 3 {
+                break;
+            }
+            lines.push(head_buf);
+        }
 
         let mut request = Request::from_lines(lines)?;
 
         if let Some(length) = request.headers.get("Content-Length".to_string()) {
-            let mut buf_reader = BufReader::new(&mut stream);
             let mut buf = vec![0u8; length.parse::<usize>().unwrap()];
             buf_reader.read_exact(&mut buf).unwrap(); // TODO: handle this
+
+            request.append_content(buf);
         }
 
+        println!("{:#?}", request);
         Result::Ok(request)
     }
 }

@@ -41,6 +41,7 @@ impl Header {
 }
 
 
+#[derive(Debug)]
 pub struct HeaderMap {
     headers: HashMap<String, String>
 }

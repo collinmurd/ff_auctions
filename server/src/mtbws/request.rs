@@ -3,6 +3,7 @@ use std::{str::FromStr};
 
 use super::{HTTPMethod,  HeaderMap};
 
+#[derive(Debug)]
 pub struct Request {
     pub control: Control,
     pub headers: HeaderMap,
@@ -36,6 +37,7 @@ impl Request {
     }
 }
 
+#[derive(Debug)]
 pub struct Control {
     pub method: HTTPMethod,
     pub uri: String,
@@ -70,7 +72,8 @@ pub enum CreateRequestError {
     InvalidMethod,
     InvalidControlLine,
     InvalidHeader,
-    EmptyRequest
+    EmptyRequest,
+    ParseError
 }
 
 #[cfg(test)]
