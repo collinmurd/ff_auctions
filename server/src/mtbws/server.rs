@@ -2,7 +2,8 @@ use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 
 use super::request::CreateRequestError;
-use super::{HTTPMethod, Request, Response};
+use super::response::Response;
+use super::{HTTPMethod, Request};
 
 type Handler<'a> = &'a dyn Fn(&Request) -> Response;
 

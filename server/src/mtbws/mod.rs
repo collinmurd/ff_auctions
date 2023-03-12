@@ -22,6 +22,7 @@ pub enum HTTPMethod {
 
 pub mod server;
 pub mod request;
+pub mod response;
 
 
 #[derive(Debug)]
@@ -56,12 +57,6 @@ impl HeaderMap {
     }
 }
 
-
-pub struct Response {
-    status_code: u8,
-    headers: HeaderMap,
-    content: String
-}
 
 #[cfg(test)]
 mod tests {
