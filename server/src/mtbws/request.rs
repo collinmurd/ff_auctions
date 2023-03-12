@@ -1,24 +1,27 @@
 
-use std::{str::FromStr, net::TcpStream};
+use std::{str::FromStr};
 
 use super::{HTTPMethod,  HeaderMap};
 
-pub struct Request<'r> {
-    pub control: Control<'r>,
-    pub headers: HeaderMap<'r>,
+pub struct Request {
+    pub control: Control,
+    pub headers: HeaderMap,
     pub content: String
 }
 
-impl<'r> Request<'r> {
+impl Request {
     /// Creates a [Request] object from a [std::Vec](Vec<String>) 
     /// representing the lines of an HTTP request.
-    pub fn from_lines(lines: Vec<&'r str>) -> Result<Request<'r>, CreateRequestError> {
-        let control = Control::from(lines[0])?;
+    pub fn from_lines(lines: Vec<String>) -> Result<Request, CreateRequestError> {
+        if lines.len() < 1 {
+            return Result::Err(CreateRequestError::EmptyRequest);
+        }
+        let control = Control::from(lines.get(0).unwrap().trim().to_string())?;
         let mut headers = HeaderMap::new();
         for line in lines.iter().skip(1) {
             let clean_line = line.trim();
             if clean_line != "" {
-                match headers.add_from_line(clean_line) {
+                match headers.add_from_line(clean_line.to_string()) {
                     Ok(_) => (),
                     Err(_) => return Result::Err(CreateRequestError::InvalidHeader)
                 };
@@ -28,19 +31,19 @@ impl<'r> Request<'r> {
         Result::Ok(Request { control: control, headers: headers, content: String::new() })
     }
 
-    pub fn append_content(&mut self, new_content: &'r str) {
+    pub fn append_content(&mut self, new_content: &str) {
         self.content.push_str(new_content);
     }
 }
 
-pub struct Control<'a> {
+pub struct Control {
     pub method: HTTPMethod,
-    pub uri: &'a str,
-    pub version: &'a str 
+    pub uri: String,
+    pub version: String 
 }
 
-impl<'r> Control<'r> {
-    pub fn from(control_line: &'r str) -> Result<Control<'r>, CreateRequestError> {
+impl Control {
+    pub fn from(control_line: String) -> Result<Control, CreateRequestError> {
         let control: Vec<&str> = control_line.split(' ').collect();
         if control.len() != 3 {
             return Result::Err(CreateRequestError::InvalidControlLine);
@@ -56,7 +59,7 @@ impl<'r> Control<'r> {
             return Result::Err(CreateRequestError::InvalidHTTPVersion);
         }
 
-        Result::Ok(Control { method: method, uri: control[1], version: version })
+        Result::Ok(Control { method: method, uri: control[1].to_string(), version: version.to_string() })
     }
 }
 
@@ -66,7 +69,8 @@ pub enum CreateRequestError {
     InvalidHTTPVersion,
     InvalidMethod,
     InvalidControlLine,
-    InvalidHeader
+    InvalidHeader,
+    EmptyRequest
 }
 
 #[cfg(test)]
@@ -75,14 +79,14 @@ mod tests {
 
     #[test]
     fn request_from_lines() {
-        let good_lines = vec!["GET / HTTP/1.1", "My-Header: something"];
-        let bad_control = vec!["POST HTTP/1.1", "My-Header: something"];
-        let bad_header = vec!["GET / HTTP/1.1", "ahhhhh!"];
+        let good_lines = vec![String::from("GET / HTTP/1.1"), String::from("My-Header: something")];
+        let bad_control = vec![String::from("POST HTTP/1.1"), String::from("My-Header: something")];
+        let bad_header = vec![String::from("GET / HTTP/1.1"), String::from("ahhhhh!")];
 
         let req = Request::from_lines(good_lines).unwrap();
         assert_eq!(req.control.uri, String::from("/"));
-        assert!(req.headers.get("My-Header").is_some());
-        assert_eq!(req.headers.get("My-Header").unwrap(), "something");
+        assert!(req.headers.get(String::from("My-Header")).is_some());
+        assert_eq!(req.headers.get(String::from("My-Header")).unwrap(), "something");
 
         assert!(Request::from_lines(bad_control).is_err());
         assert!(Request::from_lines(bad_header).is_err());
@@ -94,18 +98,18 @@ mod tests {
         let bad_method = String::from("BLAH /asdf/fda?a=b HTTP/1.1");
         let missing_version = String::from("GET /asdf/fda?a=b ");
 
-        let good_control = Control::from(&good_line).unwrap();
+        let good_control = Control::from(good_line).unwrap();
         assert_eq!(good_control.method, HTTPMethod::POST);
         assert_eq!(good_control.uri, String::from("/asdf/fda?a=b"));
         assert_eq!(good_control.version, String::from("HTTP/1.1"));
 
-        assert!(Control::from(&bad_method).is_err());
-        assert!(Control::from(&missing_version).is_err());
+        assert!(Control::from(bad_method).is_err());
+        assert!(Control::from(missing_version).is_err());
     }
 
     #[test]
     fn append_content() {
-        let good_lines = vec!["GET / HTTP/1.1", "My-Header: something"];
+        let good_lines = vec![String::from("GET / HTTP/1.1"), String::from("My-Header: something")];
         let mut req = Request::from_lines(good_lines).unwrap();
         req.append_content("new_content");
 

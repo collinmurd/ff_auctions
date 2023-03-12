@@ -1,6 +1,7 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 
+use super::request::CreateRequestError;
 use super::{HTTPMethod, Request, Response};
 
 type Handler<'a> = &'a dyn Fn(Request) -> Response;
@@ -35,13 +36,19 @@ impl<'a> Server<'a> {
     }
 
     fn handle_connection(&self, mut stream: TcpStream){
+        let request = self.create_request(stream).unwrap();
+    }
+
+    fn create_request(&self, mut stream: TcpStream) -> Result<Request, CreateRequestError> {
         let buf_reader = BufReader::new(&mut stream);
-        let http_request: Vec<_> = buf_reader.lines()
+        let lines: Vec<_> = buf_reader.lines()
             .map(|result| result.unwrap())
             .take_while(|line| !line.is_empty())
             .collect();
 
-        println!("Request: {:#?}", http_request);
+        let mut request = Request::from_lines(lines)?;
+
+        Result::Ok(request)
     }
 }
 
@@ -52,7 +59,7 @@ struct Endpoint<'a> {
 }
 
 impl<'a> Endpoint<'a> {
-    fn handle<'b>(&self, req: Request<'b>) -> Response<'b> {
+    fn handle(&self, req: Request) -> Response {
         (self.handler)(req)
     }
 }
@@ -69,11 +76,11 @@ mod tests {
         let mut server = Server::new();
 
         let mut header_map = HeaderMap::new();
-        header_map.add("key", "value");
+        header_map.add(String::from("key"), String::from("value"));
 
         fn my_good_handler_fn(_req: Request) -> Response {
             let mut header_map = HeaderMap::new();
-            header_map.add("key", "value");
+            header_map.add(String::from("key"), String::from("value"));
             Response {
                 status_code: 201,
                 headers: header_map,
@@ -85,7 +92,7 @@ mod tests {
         assert_eq!(server.endpoints.len(), 1);
 
         let req = Request {
-            control: Control { method: HTTPMethod::GET, uri: "/", version: "HTTP/1.1" },
+            control: Control { method: HTTPMethod::GET, uri: String::from("/"), version: String::from("HTTP/1.1") },
             headers: header_map,
             content: String::from("asdf")
         };

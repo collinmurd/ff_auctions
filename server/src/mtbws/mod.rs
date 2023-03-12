@@ -41,31 +41,31 @@ impl Header {
 }
 
 
-pub struct HeaderMap<'r> {
-    headers: HashMap<&'r str, &'r str>
+pub struct HeaderMap {
+    headers: HashMap<String, String>
 }
 
-impl<'r> HeaderMap<'r> {
-    pub fn new() -> HeaderMap<'r> {
+impl HeaderMap {
+    pub fn new() -> HeaderMap {
         HeaderMap { headers: HashMap::new() }
     }
 
-    pub fn add(&mut self, name: &'r str, value: &'r str) {
+    pub fn add(&mut self, name: String, value: String) {
         self.headers.insert(name, value);
     }
 
-    pub fn add_from_line(&mut self, line: &'r str) -> Result<(), &'static str> {
+    pub fn add_from_line(&mut self, line: String) -> Result<(), &'static str> {
         match line.split_once(": ") {
             Some((name, value)) => {
-                self.headers.insert(name, value);
+                self.add(name.to_string(), value.to_string());
                 return Result::Ok(());
             }
             None => Result::Err("Invalid Header line")
         }
     }
 
-    pub fn get(&self, name: &'r str) -> Option<&'r str> {
-        match self.headers.get(name) {
+    pub fn get(&self, name: String) -> Option<&String> {
+        match self.headers.get(&name) {
             Some(v) => Option::Some(v),
             None => Option::None
         }
@@ -73,9 +73,9 @@ impl<'r> HeaderMap<'r> {
 }
 
 
-pub struct Response<'r> {
+pub struct Response {
     status_code: u8,
-    headers: HeaderMap<'r>,
+    headers: HeaderMap,
     content: String
 }
 
@@ -87,11 +87,11 @@ mod tests {
     fn parse_headers() {
         let mut header_map = HeaderMap::new();
         let good = String::from("Content-Type: something");
-        assert!(header_map.add_from_line(&good).is_ok());
-        assert!(header_map.get("Content-Type").is_some());
-        assert_eq!(header_map.get("Content-Type").unwrap(), "something");
+        assert!(header_map.add_from_line(good).is_ok());
+        assert!(header_map.get(String::from("Content-Type")).is_some());
+        assert_eq!(header_map.get(String::from("Content-Type")).unwrap(), "something");
 
         let bad = String::from("ahhhhhhhhhhh!");
-        assert!(header_map.add_from_line(&bad).is_err());
+        assert!(header_map.add_from_line(bad).is_err());
     }
 }
