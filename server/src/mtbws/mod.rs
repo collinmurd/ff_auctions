@@ -23,23 +23,6 @@ pub enum HTTPMethod {
 pub mod server;
 pub mod request;
 
-pub struct Header {
-    name: String,
-    value: String
-}
-
-impl Header {
-    pub fn from(line: String) -> Result<Header, &'static str> {
-        match line.split_once(": ") {
-            Some((name, value)) => Result::Ok(Header { 
-                name: String::from(name),
-                value: String::from(value)
-            }),
-            None => Result::Err("Invalid Header line")
-        }
-    }
-}
-
 
 #[derive(Debug)]
 pub struct HeaderMap {
