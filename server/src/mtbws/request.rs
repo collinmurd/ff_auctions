@@ -1,5 +1,5 @@
 
-use std::{str::FromStr, str::from_utf8};
+use std::{str::FromStr};
 
 use super::{HTTPMethod,  HeaderMap};
 
@@ -76,6 +76,7 @@ pub enum CreateRequestError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::str;
 
     #[test]
     fn request_from_lines() {
@@ -113,6 +114,6 @@ mod tests {
         let mut req = Request::from_lines(good_lines).unwrap();
         req.append_content("new_content".as_bytes().to_vec());
 
-        assert_eq!(from_utf8(&req.content).unwrap(), "new_content");
+        assert_eq!(str::from_utf8(&req.content).unwrap(), "new_content");
     }
 }
