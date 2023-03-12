@@ -5,7 +5,7 @@ use super::request::CreateRequestError;
 use super::response::Response;
 use super::{HTTPMethod, Request};
 
-type Handler<'a> = &'a dyn Fn(&Request) -> Response;
+type Handler<'a> = &'a dyn Fn(&Request) -> Option<Response>;
 
 pub struct Server<'a> {
     endpoints: Vec<Endpoint<'a>>
@@ -45,6 +45,7 @@ impl<'a> Server<'a> {
         for endpoint in &self.endpoints {
             if request.control.uri == endpoint.pattern {
                 endpoint.handle(&request);
+                break;
             }
         }
     }
@@ -75,6 +76,10 @@ impl<'a> Server<'a> {
 
         Result::Ok(request)
     }
+
+    fn send_response(&self, res: Response, mut stream: TcpStream) {
+        stream.write(&res.http_format());
+    }
 }
 
 struct Endpoint<'a> {
@@ -84,7 +89,7 @@ struct Endpoint<'a> {
 }
 
 impl<'a> Endpoint<'a> {
-    fn handle(&self, req: &Request) -> Response {
+    fn handle(&self, req: &Request) -> Option<Response> {
         (self.handler)(req)
     }
 }
@@ -103,14 +108,14 @@ mod tests {
         let mut header_map = HeaderMap::new();
         header_map.add(String::from("key"), String::from("value"));
 
-        fn my_good_handler_fn(_req: &Request) -> Response {
+        fn my_good_handler_fn(_req: &Request) -> Option<Response> {
             let mut header_map = HeaderMap::new();
             header_map.add(String::from("key"), String::from("value"));
-            Response {
+            Some(Response {
                 status_code: 201,
                 headers: header_map,
                 content: String::from("content")
-            }
+            })
         }
 
         server.register_endpoint(HTTPMethod::GET, String::from("/"), &my_good_handler_fn);
@@ -121,7 +126,7 @@ mod tests {
             headers: header_map,
             content: "asdf".as_bytes().to_vec()
         };
-        assert_eq!(server.endpoints.get(0).unwrap().handle(&req).status_code, 201);
+        assert_eq!(server.endpoints.get(0).unwrap().handle(&req).unwrap().status_code, 201);
 
         server.register_endpoint(HTTPMethod::GET, String::from("/asdf"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 2);
