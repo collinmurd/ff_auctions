@@ -14,9 +14,13 @@ pub struct Server<'a> {
 impl<'a> Server<'a> {
 
     pub fn new() -> Server<'a> {
-        return Server {
+        let mut s = Server {
             endpoints: Vec::new()
-        }
+        };
+
+        s.register_endpoint(HTTPMethod::GET, "/health".to_string(), &health_check_handler);
+
+        s
     }
 
     pub fn listen(&self) {
@@ -86,6 +90,10 @@ impl<'a> Server<'a> {
             _ => ()
         }
     }
+}
+
+fn health_check_handler(_req: &Request) -> Option<Response> {
+    Some(Response::new(200).unwrap())
 }
 
 struct Endpoint<'a> {
