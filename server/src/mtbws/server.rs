@@ -8,13 +8,15 @@ use super::{HTTPMethod, Request};
 type Handler<'a> = &'a dyn Fn(&Request) -> Option<Response>;
 
 pub struct Server<'a> {
+    port: u16,
     endpoints: Vec<Endpoint<'a>>
 }
 
 impl<'a> Server<'a> {
 
-    pub fn new() -> Server<'a> {
+    pub fn new(port: u16) -> Server<'a> {
         let mut s = Server {
+            port: port,
             endpoints: Vec::new()
         };
 
@@ -24,7 +26,7 @@ impl<'a> Server<'a> {
     }
 
     pub fn listen(&self) {
-        let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+        let listener = TcpListener::bind(format!("127.0.0.1:{}", self.port)).unwrap();
 
         for stream in listener.incoming() {
             let stream = stream.unwrap();
@@ -127,7 +129,7 @@ mod tests {
 
     #[test]
     fn register_handler() {
-        let mut server = Server::new();
+        let mut server = Server::new(7878);
 
         let mut header_map = HeaderMap::new();
         header_map.add(String::from("key"), String::from("value"));
