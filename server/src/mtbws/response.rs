@@ -54,10 +54,12 @@ static STATUS_CODES: phf::Map<u16, &'static str> = phf_map! {
     505u16 => "HTTP Version Not Supported",
 };
 
+const HTTP_VERSION: &str = "HTTP/1.1";
+
 pub struct Response {
     status_code: u16,
     headers: HeaderMap,
-    content: String
+    content: Vec<u8>
 }
 
 impl Response {
@@ -68,13 +70,25 @@ impl Response {
         Some(Response {
             status_code: status_code,
             headers: HeaderMap::new(),
-            content: String::new()
+            content: Vec::new()
         })
     }
 
     /// Return HTTP formatted response message
     pub fn http_format(&self) -> Vec<u8> {
-        vec![0u8, 4]
+        let mut head = String::new();
+        let status_text = STATUS_CODES.get(&self.status_code).unwrap(); // unwrap safe because it's validated
+        head.push_str(format!("{} {} {}", HTTP_VERSION, self.status_code, status_text).as_str());
+
+        for header in &self.headers.headers {
+            head.push_str(format!("\n{}: {}", header.0, header.1).as_str());
+        }
+
+        head.push_str("\n\n");
+        let mut resp = head.as_bytes().to_vec();
+        resp.extend(&self.content);
+
+        resp
     }
 
     pub fn get_status_code(&self) -> u16 {

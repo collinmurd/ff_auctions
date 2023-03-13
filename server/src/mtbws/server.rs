@@ -77,7 +77,7 @@ impl<'a> Server<'a> {
         Result::Ok(request)
     }
 
-    fn send_response(&self, res: Response, mut stream: TcpStream) {
+    fn send_response(&self, mut res: Response, mut stream: TcpStream) {
         stream.write(&res.http_format());
     }
 }
