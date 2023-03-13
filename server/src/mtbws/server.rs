@@ -46,15 +46,15 @@ impl<'a> Server<'a> {
             Err(_) => {println!("400"); return;} // TODO: return a 400 response
         };
 
-        // for endpoint in &self.endpoints {
-        //     if request.control.uri == endpoint.pattern {
-        //         match endpoint.handle(&request) {
-        //             Some(r) => self.send_response(r, stream),
-        //             None => println!("Would respond with 500 here")
-        //         }
-        //         break;
-        //     }
-        // }
+        for endpoint in &self.endpoints {
+            if request.control.uri == endpoint.pattern {
+                match endpoint.handle(&request) {
+                    Some(r) => self.send_response(r, stream),
+                    None => println!("Would respond with 500 here")
+                }
+                break;
+            }
+        }
     }
 
     fn create_request(&self, mut stream: &TcpStream) -> Result<Request, CreateRequestError> {
@@ -84,26 +84,26 @@ impl<'a> Server<'a> {
         Result::Ok(request)
     }
 
-    // fn send_response(&self, mut res: Response, mut stream: TcpStream) {
-    //     let headers = res.get_mut_headers();
+    fn send_response(&self, mut res: Response, mut stream: TcpStream) {
+        if !res.headers.has_header(&"Connection".to_string()) {
+            res.headers.add("Connection".to_string(), "close".to_string());
+        }
 
-    //     if !headers.has_header(&"Connection".to_string()) {
-    //         headers.add("Connection".to_string(), "close".to_string());
-    //     }
-
-    //     if res.get_content().len() > 0 {
-    //         headers.add("Content-Length".to_string(), format!("{}", res.get_content().len()));
-    //     }
-    //     let mes = &res.http_format();
-    //     match stream.write(mes) {
-    //         Err(e) => println!("Error writing to stream: {}", e),
-    //         _ => ()
-    //     }
-    // }
+        if res.content.len() > 0 {
+            res.headers.add("Content-Length".to_string(), format!("{}", res.content.len()));
+        }
+        let mes = &res.http_format();
+        match stream.write(mes) {
+            Err(e) => println!("Error writing to stream: {}", e),
+            _ => ()
+        }
+    }
 }
 
 fn health_check_handler(_req: &Request) -> Option<Response> {
-    Some(Response::new(200).unwrap())
+    let mut res = Response::new(200).unwrap();
+    res.content = "Healthy!\n".as_bytes().to_vec();
+    Some(res)
 }
 
 struct Endpoint<'a> {
