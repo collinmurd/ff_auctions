@@ -37,20 +37,23 @@ impl<'a> Server<'a> {
     }
 
     fn handle_connection(&self, stream: TcpStream){
-        let request = match self.create_request(stream) {
+        let request = match self.create_request(&stream) {
             Ok(r) => r,
             Err(_) => {println!("400"); return;} // TODO: return a 400 response
         };
 
         for endpoint in &self.endpoints {
             if request.control.uri == endpoint.pattern {
-                endpoint.handle(&request);
+                match endpoint.handle(&request) {
+                    Some(r) => self.send_response(r, stream),
+                    None => println!("Would respond with 500 here")
+                }
                 break;
             }
         }
     }
 
-    fn create_request(&self, mut stream: TcpStream) -> Result<Request, CreateRequestError> {
+    fn create_request(&self, mut stream: &TcpStream) -> Result<Request, CreateRequestError> {
         let mut buf_reader = BufReader::new(&mut stream);
         let mut lines: Vec<String> = Vec::new();
         loop {
@@ -77,8 +80,11 @@ impl<'a> Server<'a> {
         Result::Ok(request)
     }
 
-    fn send_response(&self, mut res: Response, mut stream: TcpStream) {
-        stream.write(&res.http_format());
+    fn send_response(&self, res: Response, mut stream: TcpStream) {
+        match stream.write(&res.http_format()) {
+            Err(e) => println!("Error writing to stream: {}", e),
+            _ => ()
+        }
     }
 }
 
