@@ -139,19 +139,19 @@ mod tests {
         }
 
         server.register_endpoint(HTTPMethod::GET, String::from("/"), &my_good_handler_fn);
-        assert_eq!(server.endpoints.len(), 1);
+        assert_eq!(server.endpoints.len(), 2);
 
         let req = Request {
             control: Control { method: HTTPMethod::GET, uri: String::from("/"), version: String::from("HTTP/1.1") },
             headers: header_map,
             content: "asdf".as_bytes().to_vec()
         };
-        assert_eq!(server.endpoints.get(0).unwrap().handle(&req).unwrap().status_code.get().0, 201);
+        assert_eq!(server.endpoints.get(1).unwrap().handle(&req).unwrap().status_code.get().0, 201);
 
         server.register_endpoint(HTTPMethod::GET, String::from("/asdf"), &my_good_handler_fn);
-        assert_eq!(server.endpoints.len(), 2);
+        assert_eq!(server.endpoints.len(), 3);
 
         server.register_endpoint(HTTPMethod::POST, String::from("/asdf"), &my_good_handler_fn);
-        assert_eq!(server.endpoints.len(), 3);
+        assert_eq!(server.endpoints.len(), 4);
     }
 }
