@@ -111,11 +111,7 @@ mod tests {
         fn my_good_handler_fn(_req: &Request) -> Option<Response> {
             let mut header_map = HeaderMap::new();
             header_map.add(String::from("key"), String::from("value"));
-            Some(Response {
-                status_code: 201,
-                headers: header_map,
-                content: String::from("content")
-            })
+            Some(Response::new(201).unwrap())
         }
 
         server.register_endpoint(HTTPMethod::GET, String::from("/"), &my_good_handler_fn);
@@ -126,7 +122,7 @@ mod tests {
             headers: header_map,
             content: "asdf".as_bytes().to_vec()
         };
-        assert_eq!(server.endpoints.get(0).unwrap().handle(&req).unwrap().status_code, 201);
+        assert_eq!(server.endpoints.get(0).unwrap().handle(&req).unwrap().get_status_code(), 201);
 
         server.register_endpoint(HTTPMethod::GET, String::from("/asdf"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 2);
