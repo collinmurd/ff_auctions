@@ -56,29 +56,56 @@ static STATUS_CODES: phf::Map<u16, &'static str> = phf_map! {
 
 const HTTP_VERSION: &str = "HTTP/1.1";
 
+pub struct StatusCode {
+    code: u16
+}
+
+impl StatusCode {
+    pub fn new(code: u16) -> Option<StatusCode> {
+        if StatusCode::check(code) {
+            return Some(StatusCode{code});
+        }
+        None
+    }
+
+    fn check(code: u16) -> bool {
+        STATUS_CODES.contains_key(&code)
+    }
+
+    pub fn set(&mut self, code: u16) {
+        if StatusCode::check(code) {
+            self.code = code;
+        }
+    }
+
+    pub fn get(&self) -> (u16, &'static str) {
+        (self.code, STATUS_CODES.get(&self.code).unwrap()) // unwrap safe because self.code is validated
+    }
+}
+
 pub struct Response {
-    status_code: u16,
-    headers: HeaderMap,
-    content: Vec<u8>
+    pub status_code: StatusCode,
+    pub headers: HeaderMap,
+    pub content: Vec<u8>
 }
 
 impl Response {
     pub fn new(status_code: u16) -> Option<Response> {
-        if !STATUS_CODES.contains_key(&status_code) {
-            return None;
+        match StatusCode::new(status_code) {
+            Some(c) => Some(Response {
+                            status_code: c,
+                            headers: HeaderMap::new(),
+                            content: Vec::new()
+                        }),
+            None => None
         }
-        Some(Response {
-            status_code: status_code,
-            headers: HeaderMap::new(),
-            content: Vec::new()
-        })
     }
 
     /// Return HTTP formatted response message
     pub fn http_format(&self) -> Vec<u8> {
         let mut head = String::new();
-        let status_text = STATUS_CODES.get(&self.status_code).unwrap(); // unwrap safe because it's validated
-        head.push_str(format!("{} {} {}", HTTP_VERSION, self.status_code, status_text).as_str());
+        let status_text = self.status_code.get().1; // unwrap safe because it's validated
+        head.push_str(format!("{} {} {}", HTTP_VERSION, self.status_code.get().0, status_text).as_str());
 
         for header in &self.headers.headers {
             head.push_str(format!("\n{}: {}", header.0, header.1).as_str());
@@ -90,8 +117,16 @@ impl Response {
 
         resp
     }
+}
 
-    pub fn get_status_code(&self) -> u16 {
-        self.status_code
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn status_code() {
+        assert!(StatusCode::new(10).is_none());
+        assert!(StatusCode::new(200).is_some());
+        assert_eq!(StatusCode::new(404).unwrap().get().1, "Not Found");
     }
 }

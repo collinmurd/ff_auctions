@@ -55,6 +55,10 @@ impl HeaderMap {
             None => Option::None
         }
     }
+
+    pub fn has_header(&self, name: &String) -> bool {
+        self.headers.contains_key(name)
+    }
 }
 
 

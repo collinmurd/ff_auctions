@@ -46,15 +46,15 @@ impl<'a> Server<'a> {
             Err(_) => {println!("400"); return;} // TODO: return a 400 response
         };
 
-        for endpoint in &self.endpoints {
-            if request.control.uri == endpoint.pattern {
-                match endpoint.handle(&request) {
-                    Some(r) => self.send_response(r, stream),
-                    None => println!("Would respond with 500 here")
-                }
-                break;
-            }
-        }
+        // for endpoint in &self.endpoints {
+        //     if request.control.uri == endpoint.pattern {
+        //         match endpoint.handle(&request) {
+        //             Some(r) => self.send_response(r, stream),
+        //             None => println!("Would respond with 500 here")
+        //         }
+        //         break;
+        //     }
+        // }
     }
 
     fn create_request(&self, mut stream: &TcpStream) -> Result<Request, CreateRequestError> {
@@ -84,12 +84,22 @@ impl<'a> Server<'a> {
         Result::Ok(request)
     }
 
-    fn send_response(&self, res: Response, mut stream: TcpStream) {
-        match stream.write(&res.http_format()) {
-            Err(e) => println!("Error writing to stream: {}", e),
-            _ => ()
-        }
-    }
+    // fn send_response(&self, mut res: Response, mut stream: TcpStream) {
+    //     let headers = res.get_mut_headers();
+
+    //     if !headers.has_header(&"Connection".to_string()) {
+    //         headers.add("Connection".to_string(), "close".to_string());
+    //     }
+
+    //     if res.get_content().len() > 0 {
+    //         headers.add("Content-Length".to_string(), format!("{}", res.get_content().len()));
+    //     }
+    //     let mes = &res.http_format();
+    //     match stream.write(mes) {
+    //         Err(e) => println!("Error writing to stream: {}", e),
+    //         _ => ()
+    //     }
+    // }
 }
 
 fn health_check_handler(_req: &Request) -> Option<Response> {
@@ -136,7 +146,7 @@ mod tests {
             headers: header_map,
             content: "asdf".as_bytes().to_vec()
         };
-        assert_eq!(server.endpoints.get(0).unwrap().handle(&req).unwrap().get_status_code(), 201);
+        assert_eq!(server.endpoints.get(0).unwrap().handle(&req).unwrap().status_code.get().0, 201);
 
         server.register_endpoint(HTTPMethod::GET, String::from("/asdf"), &my_good_handler_fn);
         assert_eq!(server.endpoints.len(), 2);
