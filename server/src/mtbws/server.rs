@@ -45,18 +45,23 @@ impl<'a> Server<'a> {
     fn handle_connection(&self, stream: TcpStream){
         let request = match self.create_request(&stream) {
             Ok(r) => r,
-            Err(_) => {println!("400"); return;} // TODO: return a 400 response
+            Err(_) => {println!("Would respond with 400 here"); return;} // TODO: return a 400 response
         };
 
-        match &self.endpoints.iter().find(|&e| request.control.uri == e.pattern ) {
+        let endpoint = &self.endpoints.iter().find(|&e| request.control.uri == e.pattern );
+
+        match endpoint {
             Some(e) => {
+                if e.method != request.control.method {
+                    println!("Would respond with 405 here")
+                }
                 match e.handle(&request) {
                     Some(r) => self.send_response(r, stream),
                     None => println!("Would respond with 500 here")
                 }
             },
             None => println!("Would return 404 here")
-        }
+        };
     }
 
     fn create_request(&self, mut stream: &TcpStream) -> Result<Request, CreateRequestError> {
@@ -68,7 +73,7 @@ impl<'a> Server<'a> {
                 Ok(l) => l,
                 Err(_) => return Err(CreateRequestError::ParseError)
             };
-            if l < 3 {
+            if l < 3 { // empty line
                 break;
             }
             lines.push(head_buf);
