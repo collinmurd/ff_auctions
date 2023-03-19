@@ -48,14 +48,14 @@ impl<'a> Server<'a> {
             Err(_) => {println!("400"); return;} // TODO: return a 400 response
         };
 
-        for endpoint in &self.endpoints {
-            if request.control.uri == endpoint.pattern {
-                match endpoint.handle(&request) {
+        match &self.endpoints.iter().find(|&e| request.control.uri == e.pattern ) {
+            Some(e) => {
+                match e.handle(&request) {
                     Some(r) => self.send_response(r, stream),
                     None => println!("Would respond with 500 here")
                 }
-                break;
-            }
+            },
+            None => println!("Would return 404 here")
         }
     }
 
