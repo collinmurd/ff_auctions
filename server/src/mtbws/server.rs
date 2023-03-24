@@ -1,7 +1,7 @@
 use std::net::{TcpListener, TcpStream};
-use std::io::{prelude::*, BufReader};
+use std::io::{prelude::*};
 
-use super::request::CreateRequestError;
+use super::request;
 use super::response::Response;
 use super::{HTTPMethod, Request};
 
@@ -43,7 +43,7 @@ impl<'a> Server<'a> {
     }
 
     fn handle_connection(&self, stream: TcpStream){
-        let request = match self.create_request(&stream) {
+        let request = match request::create_request(&stream) {
             Ok(r) => r,
             Err(_) => {println!("Would respond with 400 here"); return;} // TODO: return a 400 response
         };
@@ -62,33 +62,6 @@ impl<'a> Server<'a> {
             },
             None => println!("Would return 404 here")
         };
-    }
-
-    fn create_request(&self, mut stream: &TcpStream) -> Result<Request, CreateRequestError> {
-        let mut buf_reader = BufReader::new(&mut stream);
-        let mut lines: Vec<String> = Vec::new();
-        loop {
-            let mut head_buf = String::new();
-            let l = match buf_reader.read_line(&mut head_buf) {
-                Ok(l) => l,
-                Err(_) => return Err(CreateRequestError::ParseError)
-            };
-            if l < 3 { // empty line
-                break;
-            }
-            lines.push(head_buf);
-        }
-
-        let mut request = Request::from_lines(lines)?;
-
-        if let Some(length) = request.headers.get("Content-Length".to_string()) {
-            let mut buf = vec![0u8; length.parse::<usize>().unwrap()];
-            buf_reader.read_exact(&mut buf).unwrap(); // TODO: handle this
-
-            request.append_content(buf);
-        }
-
-        Result::Ok(request)
     }
 
     fn send_response(&self, mut res: Response, mut stream: TcpStream) {

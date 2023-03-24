@@ -1,7 +1,35 @@
 
-use std::{str::FromStr};
+use std::{str::FromStr, net::TcpStream, io::{prelude::*, BufReader}};
 
 use super::{HTTPMethod,  HeaderMap};
+
+
+pub fn create_request(mut stream: &TcpStream) -> Result<Request, CreateRequestError> {
+    let mut buf_reader = BufReader::new(&mut stream);
+    let mut lines: Vec<String> = Vec::new();
+    loop {
+        let mut head_buf = String::new();
+        let l = match buf_reader.read_line(&mut head_buf) {
+            Ok(l) => l,
+            Err(_) => return Err(CreateRequestError::ParseError)
+        };
+        if l < 3 { // empty line
+            break;
+        }
+        lines.push(head_buf);
+    }
+
+    let mut request = Request::from_lines(lines)?;
+
+    if let Some(length) = request.headers.get("Content-Length".to_string()) {
+        let mut buf = vec![0u8; length.parse::<usize>().unwrap()];
+        buf_reader.read_exact(&mut buf).unwrap(); // TODO: handle this
+
+        request.append_content(buf);
+    }
+
+    Result::Ok(request)
+}
 
 #[derive(Debug)]
 pub struct Request {
