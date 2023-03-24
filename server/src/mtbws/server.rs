@@ -21,7 +21,6 @@ impl<'a> Server<'a> {
         };
 
         s.register_endpoint(HTTPMethod::GET, "/health".to_string(), &health_check_handler);
-
         s
     }
 
@@ -42,10 +41,10 @@ impl<'a> Server<'a> {
         self.endpoints.push(Endpoint { method: method, pattern: pattern, handler: handler });
     }
 
-    fn handle_connection(&self, stream: TcpStream){
+    fn handle_connection(&self, stream: TcpStream) {
         let request = match request::create_request(&stream) {
             Ok(r) => r,
-            Err(_) => {println!("Would respond with 400 here"); return;} // TODO: return a 400 response
+            Err(_) => {self.send_response(Response::new(400).unwrap(), stream); return;}
         };
 
         let endpoint = &self.endpoints.iter().find(|&e| request.control.uri == e.pattern );
@@ -53,14 +52,15 @@ impl<'a> Server<'a> {
         match endpoint {
             Some(e) => {
                 if e.method != request.control.method {
-                    println!("Would respond with 405 here")
-                }
-                match e.handle(&request) {
-                    Some(r) => self.send_response(r, stream),
-                    None => println!("Would respond with 500 here")
+                    self.send_response(Response::new(405).unwrap(), stream);
+                } else {
+                    match e.handle(&request) {
+                        Some(r) => self.send_response(r, stream),
+                        None => self.send_response(Response::new(500).unwrap(), stream)
+                    }
                 }
             },
-            None => println!("Would return 404 here")
+            None => self.send_response(Response::new(404).unwrap(), stream)
         };
     }
 

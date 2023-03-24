@@ -92,13 +92,23 @@ pub struct Response {
 impl Response {
     pub fn new(status_code: u16) -> Option<Response> {
         match StatusCode::new(status_code) {
-            Some(c) => Some(Response {
-                            status_code: c,
-                            headers: HeaderMap::new(),
-                            content: Vec::new()
-                        }),
+            Some(c) => {
+                let mut r = Response {
+                    status_code: c,
+                    headers: HeaderMap::new(),
+                    content: Vec::new()
+                };
+                r.set_content_string(r.status_code.get().1);
+                Some(r)
+            },
             None => None
         }
+    }
+
+    pub fn set_content_string<S>(&mut self, content: S) 
+    where S: Into<String> {
+        let s: String = content.into();
+        self.content = s.as_bytes().to_vec();
     }
 
     /// Return HTTP formatted response message
