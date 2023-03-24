@@ -3,6 +3,16 @@ use std::{str::FromStr, net::TcpStream, io::{prelude::*, BufReader}};
 
 use super::{HTTPMethod,  HeaderMap};
 
+#[derive(Debug)]
+pub enum CreateRequestError {
+    InvalidHTTPVersion,
+    InvalidMethod,
+    InvalidControlLine,
+    InvalidHeader,
+    EmptyRequest,
+    ParseError
+}
+
 
 pub fn create_request(mut stream: &TcpStream) -> Result<Request, CreateRequestError> {
     let mut buf_reader = BufReader::new(&mut stream);
@@ -30,6 +40,7 @@ pub fn create_request(mut stream: &TcpStream) -> Result<Request, CreateRequestEr
 
     Result::Ok(request)
 }
+
 
 #[derive(Debug)]
 pub struct Request {
@@ -93,16 +104,6 @@ impl Control {
     }
 }
 
-
-#[derive(Debug)]
-pub enum CreateRequestError {
-    InvalidHTTPVersion,
-    InvalidMethod,
-    InvalidControlLine,
-    InvalidHeader,
-    EmptyRequest,
-    ParseError
-}
 
 #[cfg(test)]
 mod tests {
